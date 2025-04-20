@@ -26,9 +26,22 @@ class PersonalPanelProvider extends PanelProvider
             ->id('personal')
             ->path('personal')
             ->login()
+            ->passwordReset()
+            ->emailVerification()
+            ->registration()
+            ->profile(isSimple: false)
             ->colors([
-                'primary' => Color::Amber,
+                'danger' => Color::Rose,
+                'gray' => Color::Gray,
+                'info' => Color::Blue,
+                'primary' => Color::Indigo,
+                'success' => Color::Green,
+                'warning' => Color::Orange,
             ])
+            ->font('Poppins')
+            ->brandName(setting("site_name"))
+            //->brandLogo(setting("site_profile"))
+            ->favicon(setting("site_profile"))
             ->discoverResources(in: app_path('Filament/Personal/Resources'), for: 'App\\Filament\\Personal\\Resources')
             ->discoverPages(in: app_path('Filament/Personal/Pages'), for: 'App\\Filament\\Personal\\Pages')
             ->pages([
