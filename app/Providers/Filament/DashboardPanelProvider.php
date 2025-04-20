@@ -18,6 +18,7 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use TomatoPHP\FilamentSettingsHub\FilamentSettingsHubPlugin;
+use App\Filament\Widgets\TareasPorUsuarioChart;
 
 class DashboardPanelProvider extends PanelProvider
 {
@@ -31,6 +32,7 @@ class DashboardPanelProvider extends PanelProvider
             ->login()
             ->passwordReset()
             ->emailVerification()
+            ->registration()
             ->profile(isSimple: false)
             ->colors([
                 'danger' => Color::Rose,
@@ -58,6 +60,7 @@ class DashboardPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
                 \App\Filament\Personal\Widgets\PersonalTareasUsuarioWidget::class,
+                TareasPorUsuarioChart::class,
             ])
             ->middleware([
                 EncryptCookies::class,

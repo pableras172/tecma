@@ -6,6 +6,7 @@ use App\Filament\Resources\TareaResource;
 use Filament\Resources\Pages\CreateRecord;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Log;
+
 class CreateTarea extends CreateRecord
 {
     protected static string $resource = TareaResource::class;
@@ -28,10 +29,9 @@ class CreateTarea extends CreateRecord
                 ->actions([
                     \Filament\Notifications\Actions\Action::make('Ver')
                         ->url(route('filament.personal.resources.tareas.edit', ['record' => $this->record])),
-                ])
+                ])                
                 ->sendToDatabase($usuario);
         }
-
         Log::debug('Fin de notificaciones');
     }
 }

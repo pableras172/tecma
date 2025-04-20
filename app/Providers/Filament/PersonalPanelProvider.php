@@ -37,6 +37,7 @@ class PersonalPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Personal/Widgets'), for: 'App\\Filament\\Personal\\Widgets')
             ->widgets([
                 \App\Filament\Personal\Widgets\PersonalTareasUsuarioWidget::class,
+                \App\Filament\Personal\Widgets\TareasUsuarioChart::class,
             ])
             ->middleware([
                 EncryptCookies::class,
