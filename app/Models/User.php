@@ -8,11 +8,13 @@ use Illuminate\Notifications\Notifiable;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasAvatar;
 use Filament\Panel;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class User extends Authenticatable implements FilamentUser, HasAvatar
+class User extends Authenticatable implements FilamentUser, HasAvatar,Auditable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
+    use \OwenIt\Auditing\Auditable;
 
     /**
      * The attributes that are mass assignable.
@@ -73,7 +75,7 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
 
     public function getFilamentAvatarUrl(): ?string
     {
-        return $this->avatar_url;
+        return $this->foto;
     }
 
     public function canAccessPanel(Panel $panel): bool
@@ -84,4 +86,5 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
     {
         return $this->belongsToMany(Tarea::class, 'tarea_usuario');
     }
+
 }

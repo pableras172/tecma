@@ -25,6 +25,7 @@ use App\Models\Province;
 use App\Models\City;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
+use Tapp\FilamentAuditing\RelationManagers\AuditsRelationManager;
 
 class UserResource extends Resource
 {
@@ -192,7 +193,8 @@ class UserResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            // ...
+            AuditsRelationManager::class,
         ];
     }
 

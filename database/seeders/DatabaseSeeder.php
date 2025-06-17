@@ -18,7 +18,7 @@ class DatabaseSeeder extends Seeder
             ProvinceSeeder::class,
             CitySeeder::class,
             ClienteSeeder::class,
-        PlantaSeeder::class,
+            PlantaSeeder::class,
         ]);
         
     }

@@ -19,6 +19,8 @@ use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use TomatoPHP\FilamentSettingsHub\FilamentSettingsHubPlugin;
 use App\Filament\Widgets\TareasPorUsuarioChart;
+use Swis\Filament\Backgrounds\FilamentBackgroundsPlugin;
+use Swis\Filament\Backgrounds\ImageProviders\MyImages;
 
 class DashboardPanelProvider extends PanelProvider
 {
@@ -54,8 +56,10 @@ class DashboardPanelProvider extends PanelProvider
             ->plugin(
                 FilamentSettingsHubPlugin::make()
                     ->allowSiteSettings()
-                    ->allowSocialMenuSettings()
-                    
+                    ->allowSocialMenuSettings(),
+                FilamentBackgroundsPlugin::make()
+                ->imageProvider(MyImages::make()
+                ->directory('images/backgrounds')),                    
             )
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
