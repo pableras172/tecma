@@ -11,7 +11,7 @@ return new class extends Migration
             $table->id();
 
             $table->foreignId('parte_trabajo_id')
-                ->constrained('partes_trabajo')
+                ->constrained('parte_trabajo')
                 ->cascadeOnDelete();
 
             // Fecha de la línea
