@@ -10,7 +10,7 @@ class ParteTrabajo extends Model implements Auditable
 {
     use HasFactory;
     use \OwenIt\Auditing\Auditable;
-    protected $table = 'partes_trabajo';
+    protected $table = 'parte_trabajo';
 
     protected $fillable = [
         'numero',
