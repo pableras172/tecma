@@ -22,6 +22,8 @@ use App\Filament\Widgets\TareasPorUsuarioChart;
 use Swis\Filament\Backgrounds\FilamentBackgroundsPlugin;
 use Swis\Filament\Backgrounds\ImageProviders\MyImages;
 use App\Filament\Pages\EditProfile;
+use Filament\Support\Facades\FilamentView;
+use Illuminate\Support\Facades\Blade;
 
 class DashboardPanelProvider extends PanelProvider
 {
@@ -85,5 +87,21 @@ class DashboardPanelProvider extends PanelProvider
             ->unsavedChangesAlerts()
             ->sidebarCollapsibleOnDesktop()
             ->databaseNotifications();
+    }
+
+    public function boot(): void
+    {
+        FilamentView::registerRenderHook(
+            'panels::head.end',
+            fn (): string => Blade::render(<<<'HTML'
+                <link rel="manifest" href="/manifest.json">
+                <meta name="theme-color" content="#4f46e5">
+                <meta name="apple-mobile-web-app-capable" content="yes">
+                <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+                <meta name="apple-mobile-web-app-title" content="TECMA">
+                <link rel="apple-touch-icon" href="/images/icons/icon-192x192.png">
+                <script src="/pwa-register.js" defer></script>
+            HTML)
+        );
     }
 }
