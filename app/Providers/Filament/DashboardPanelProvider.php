@@ -101,6 +101,7 @@ class DashboardPanelProvider extends PanelProvider
                 <meta name="apple-mobile-web-app-title" content="TECMA">
                 <link rel="apple-touch-icon" href="/images/icons/icon-192x192.png">
                 <script src="/pwa-register.js" defer></script>
+                <script src="/livewire-csrf-handler.js" defer></script>
             HTML)
         );
     }

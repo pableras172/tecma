@@ -1,6 +1,5 @@
 const CACHE_NAME = 'tecma-v1';
 const urlsToCache = [
-  '/dashboard',
   '/offline.html',
 ];
 
@@ -47,6 +46,13 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // NO cachear peticiones HTML (contienen tokens CSRF)
+  const url = new URL(event.request.url);
+  const acceptHeader = event.request.headers.get('accept') || '';
+  if (acceptHeader.includes('text/html')) {
+    return;
+  }
+
   // Evitar cachear peticiones de Livewire
   if (event.request.url.includes('/livewire/')) {
     return;
@@ -54,6 +60,14 @@ self.addEventListener('fetch', (event) => {
 
   // Evitar cachear extensiones de Chrome y otros esquemas no HTTP
   if (!event.request.url.startsWith('http')) {
+    return;
+  }
+
+  // Solo cachear recursos estáticos (CSS, JS, imágenes, fuentes)
+  const staticExtensions = ['.css', '.js', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.woff', '.woff2', '.ttf', '.ico'];
+  const isStaticResource = staticExtensions.some(ext => url.pathname.endsWith(ext));
+  
+  if (!isStaticResource) {
     return;
   }
 
