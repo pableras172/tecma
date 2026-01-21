@@ -21,6 +21,7 @@ use TomatoPHP\FilamentSettingsHub\FilamentSettingsHubPlugin;
 use App\Filament\Widgets\TareasPorUsuarioChart;
 use Swis\Filament\Backgrounds\FilamentBackgroundsPlugin;
 use Swis\Filament\Backgrounds\ImageProviders\MyImages;
+use App\Filament\Pages\EditProfile;
 
 class DashboardPanelProvider extends PanelProvider
 {
@@ -35,7 +36,7 @@ class DashboardPanelProvider extends PanelProvider
             ->passwordReset()
             ->emailVerification()
             ->registration()
-            ->profile(isSimple: false)
+            ->profile(EditProfile::class)
             ->colors([
                 'danger' => Color::Rose,
                 'gray' => Color::Gray,
@@ -46,8 +47,9 @@ class DashboardPanelProvider extends PanelProvider
             ])
             ->font('Poppins')
             ->brandName(setting("site_name"))
-            //->brandLogo(setting("site_profile"))
-            ->favicon(setting("site_profile"))
+            ->brandLogo(fn () => setting("site_logo") ? asset('storage/' . setting("site_logo")) : null)
+            ->brandLogoHeight('3rem')
+            ->favicon(fn () => setting("site_profile") ? asset('storage/' . setting("site_profile")) : null)
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([

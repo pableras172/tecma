@@ -31,6 +31,7 @@ class User extends Authenticatable implements FilamentUser, HasAvatar,Auditable
         'fecha_nacimiento',
         'fecha_ingreso',
         'categoria_profesional_id',
+        'departamento_id',
         'city_id',
         'foto',
     ];
@@ -75,7 +76,17 @@ class User extends Authenticatable implements FilamentUser, HasAvatar,Auditable
 
     public function getFilamentAvatarUrl(): ?string
     {
-        return $this->foto;
+        if (!$this->foto) {
+            return null;
+        }
+        
+        // Si ya es una URL completa, devolverla tal cual
+        if (str_starts_with($this->foto, 'http')) {
+            return $this->foto;
+        }
+        
+        // Convertir ruta a URL pública
+        return asset('storage/' . $this->foto);
     }
 
     public function canAccessPanel(Panel $panel): bool
