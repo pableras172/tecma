@@ -38,6 +38,7 @@ class UserResource extends Resource
     protected static ?string $modelLabel = 'Empleado';
     protected static ?string $pluralModelLabel = 'Empleados';
 
+    protected static bool $shouldRegisterNavigation = false;
 
     public static function form(Form $form): Form
     {
@@ -54,7 +55,8 @@ class UserResource extends Resource
                             ->visibility('public')
                             ->label('Foto')
                             ->imageEditor()
-                            ->imagePreviewHeight('150'),
+                            ->imagePreviewHeight('150')
+                            ->deletable(true), // Permite quitar la foto
                         TextInput::make('name')
                             ->required(),
 

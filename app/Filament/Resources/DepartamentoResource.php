@@ -21,9 +21,10 @@ class DepartamentoResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-building-office';
 
     protected static ?string $navigationLabel = 'Departamentos';
-protected static ?string $modelLabel = 'Departamento';
-protected static ?string $pluralModelLabel = 'Departamentos';
+    protected static ?string $modelLabel = 'Departamento';
+    protected static ?string $pluralModelLabel = 'Departamentos';
 
+    protected static bool $shouldRegisterNavigation = false;
 
 
     public static function form(Form $form): Form
@@ -72,7 +73,7 @@ protected static ?string $pluralModelLabel = 'Departamentos';
             RelationManagers\UsuariosRelationManager::class,
         ];
     }
-    
+
 
     public static function getPages(): array
     {

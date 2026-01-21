@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\CategoriaProfesionalResource\Pages;
-use App\Filament\Resources\CategoriaProfesionalResource\RelationManagers;
-use App\Models\CategoriaProfesional;
+use App\Filament\Resources\TipoTrabajoResource\Pages;
+use App\Filament\Resources\TipoTrabajoResource\RelationManagers;
+use App\Models\TipoTrabajo;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -13,16 +13,15 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class CategoriaProfesionalResource extends Resource
+class TipoTrabajoResource extends Resource
 {
-    protected static ?string $model = CategoriaProfesional::class;
+    protected static ?string $model = TipoTrabajo::class;
 
-    protected static ?string $navigationGroup = 'Gestión de empleados';
-    protected static ?string $navigationIcon = 'heroicon-o-briefcase';
-
-    protected static ?string $navigationLabel = 'Categorías profesionales';
-    protected static ?string $modelLabel = 'Categoría profesional';
-    protected static ?string $pluralModelLabel = 'Categorías profesionales';
+    protected static ?string $navigationIcon = 'heroicon-o-wrench-screwdriver';
+    protected static ?string $navigationGroup = 'Configuración Tec-Ma';
+    protected static ?string $navigationLabel = 'Tipos de trabajo';
+    protected static ?string $pluralModelLabel = 'Tipos de trabajo';
+    protected static ?string $modelLabel = 'Tipo de trabajo';
 
     protected static bool $shouldRegisterNavigation = false;
 
@@ -35,6 +34,8 @@ class CategoriaProfesionalResource extends Resource
                     ->maxLength(255),
                 Forms\Components\Textarea::make('descripcion')
                     ->columnSpanFull(),
+                Forms\Components\Toggle::make('activo')
+                    ->required(),
             ]);
     }
 
@@ -44,6 +45,8 @@ class CategoriaProfesionalResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('nombre')
                     ->searchable(),
+                Tables\Columns\IconColumn::make('activo')
+                    ->boolean(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -59,6 +62,7 @@ class CategoriaProfesionalResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
             ])
+            
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
@@ -69,16 +73,16 @@ class CategoriaProfesionalResource extends Resource
     public static function getRelations(): array
     {
         return [
-            RelationManagers\UsuariosRelationManager::class,
+            //
         ];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCategoriaProfesionals::route('/'),
-            'create' => Pages\CreateCategoriaProfesional::route('/create'),
-            'edit' => Pages\EditCategoriaProfesional::route('/{record}/edit'),
+            'index' => Pages\ListTipoTrabajos::route('/'),
+            'create' => Pages\CreateTipoTrabajo::route('/create'),
+            'edit' => Pages\EditTipoTrabajo::route('/{record}/edit'),
         ];
     }
 }

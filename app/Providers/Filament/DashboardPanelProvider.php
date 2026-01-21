@@ -24,7 +24,7 @@ use Swis\Filament\Backgrounds\ImageProviders\MyImages;
 
 class DashboardPanelProvider extends PanelProvider
 {
-    
+
     public function panel(Panel $panel): Panel
     {
         return $panel
@@ -58,8 +58,8 @@ class DashboardPanelProvider extends PanelProvider
                     ->allowSiteSettings()
                     ->allowSocialMenuSettings(),
                 FilamentBackgroundsPlugin::make()
-                ->imageProvider(MyImages::make()
-                ->directory('images/backgrounds')),                    
+                    ->imageProvider(MyImages::make()
+                        ->directory('images/backgrounds')),
             )
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([

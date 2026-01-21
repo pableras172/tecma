@@ -34,6 +34,7 @@ class PlantaResource extends Resource
     protected static ?string $modelLabel = 'Planta';
     protected static ?string $pluralModelLabel = 'Plantas';
 
+    protected static bool $shouldRegisterNavigation = false;
 
     public static function form(Form $form): Form
 {
