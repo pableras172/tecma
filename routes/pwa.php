@@ -12,7 +12,7 @@ Route::get('/manifest.json', function () {
         'display' => 'standalone',
         'background_color' => '#ffffff',
         'theme_color' => '#4f46e5',
-        'orientation' => 'portrait-primary',
+        'orientation' => 'any',
         'icons' => [
             [
                 'src' => url('/images/icons/web-app-manifest-192x192.png'),

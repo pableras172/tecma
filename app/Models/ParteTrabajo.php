@@ -10,7 +10,7 @@ class ParteTrabajo extends Model implements Auditable
 {
     use HasFactory;
     use \OwenIt\Auditing\Auditable;
-    protected $table = 'parte_trabajo';
+    protected $table = 'partes_trabajo';
 
     protected $fillable = [
         'numero',
@@ -118,6 +118,11 @@ class ParteTrabajo extends Model implements Auditable
     public function lineasParteTrabajo()
     {
         return $this->hasMany(LineaParteTrabajo::class);
+    }
+
+    public function docs()
+    {
+        return $this->hasMany(Doc::class);
     }
 
     /**

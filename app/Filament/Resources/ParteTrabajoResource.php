@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ParteTrabajoResource\Pages;
 use App\Filament\Resources\ParteTrabajoResource\RelationManagers;
+use App\Filament\Resources\ParteTrabajoResource\RelationManagers\DocRelationManager;
 use App\Models\ParteTrabajo;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -402,6 +403,7 @@ class ParteTrabajoResource extends Resource
     {
         return [
             LineasParteTrabajoRelationManager::class,
+            DocRelationManager::class,
         ];
     }
 
