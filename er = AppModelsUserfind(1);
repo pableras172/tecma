@@ -1,0 +1,21 @@
+[90m= [39m[34;4mApp\Models\User[39;24m {#7218
+    [34mid[39m: [35m1[39m,
+    [34mname[39m: "[32mpablo[39m",
+    [34memail[39m: "[32mpableras172@hotmail.com[39m",
+    [34mdni[39m: [36mnull[39m,
+    [34mtelefono[39m: [36mnull[39m,
+    [34mdireccion[39m: [36mnull[39m,
+    [34mfecha_nacimiento[39m: [36mnull[39m,
+    [34mfecha_ingreso[39m: [36mnull[39m,
+    [34memail_verified_at[39m: [36mnull[39m,
+    #[33mpassword[39m: "[32m$2y$12$ajIPiYKwWmXu6rCrnbrNOOJ2DbvuuVDYyXQh/3aRd0cS/7zGRPV06[39m",
+    #[33mremember_token[39m: "[32mTSNhzVBDXNRDkDusg71NfvPVIL36FJaU0wlRK6Xf9fTbEf9x1dAaV3KYt5mC[39m",
+    [34mcreated_at[39m: "[32m2026-01-16 13:19:52[39m",
+    [34mupdated_at[39m: "[32m2026-01-28 19:25:30[39m",
+    [34mcategoria_profesional_id[39m: [35m1[39m,
+    [34mcity_id[39m: [35m1[39m,
+    [34mdepartamento_id[39m: [35m1[39m,
+    [34mfoto[39m: "[32mfotos-empleados/01KF634HMH94VHEB06QJNC162N.jpg[39m",
+    [34mactive[39m: [35m1[39m,
+  }
+

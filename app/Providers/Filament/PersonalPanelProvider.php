@@ -17,6 +17,8 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use App\Filament\Personal\Pages\Register;
+use App\Http\Middleware\CheckUserActive;
 
 class PersonalPanelProvider extends PanelProvider
 {
@@ -25,10 +27,10 @@ class PersonalPanelProvider extends PanelProvider
         return $panel
             ->id('personal')
             ->path('personal')
-            ->login()
+            ->login(\App\Filament\Personal\Pages\Login::class)
             ->passwordReset()
             ->emailVerification()
-            ->registration()
+            ->registration(Register::class)
             ->profile(isSimple: false)
             ->colors([
                 'danger' => Color::Rose,
@@ -62,9 +64,17 @@ class PersonalPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
+                CheckUserActive::class,
             ])
             ->authMiddleware([
                 Authenticate::class,
+            ])
+            ->userMenuItems([
+                'panel_dashboard' => \Filament\Navigation\MenuItem::make()
+                    ->label('Panel Admin')
+                    ->url(fn () => route('filament.dashboard.pages.dashboard'))
+                    ->icon('heroicon-o-cog-6-tooth')
+                    ->visible(fn () => auth()->user()?->hasRole('admin')),
             ])
             ->databaseNotifications();
     }

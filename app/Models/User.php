@@ -9,11 +9,12 @@ use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasAvatar;
 use Filament\Panel;
 use OwenIt\Auditing\Contracts\Auditable;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements FilamentUser, HasAvatar,Auditable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasRoles;
     use \OwenIt\Auditing\Auditable;
 
     /**
@@ -34,6 +35,7 @@ class User extends Authenticatable implements FilamentUser, HasAvatar,Auditable
         'departamento_id',
         'city_id',
         'foto',
+        'active',
     ];
 
     /**
@@ -56,6 +58,7 @@ class User extends Authenticatable implements FilamentUser, HasAvatar,Auditable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'active' => 'boolean',
         ];
     }
 
@@ -91,11 +94,36 @@ class User extends Authenticatable implements FilamentUser, HasAvatar,Auditable
 
     public function canAccessPanel(Panel $panel): bool
     {
-        return true;
+        if (!$this->active) {
+            return false;
+        }
+
+        //Mostrar en el log el id del panel
+        \Log::info('Panel Access Attempt', [
+            'panel_id' => $panel->getId(),
+            'user_id' => $this->id,
+            'user_email' => $this->email,
+        ]);
+        
+        return match ($panel->getId()) {
+            'dashboard' => $this->hasRole('admin'),
+            'personal'  => $this->hasRole('empleado') || $this->hasRole('admin'),
+            default     => false,
+        };
     }
+
+
     public function tareas()
     {
         return $this->belongsToMany(Tarea::class, 'tarea_usuario');
+    }
+
+    /**
+     * Líneas de parte de trabajo asignadas a este usuario
+     */
+    public function lineasParteTrabajo()
+    {
+        return $this->belongsToMany(LineaParteTrabajo::class, 'linea_parte_trabajo_user');
     }
 
 }

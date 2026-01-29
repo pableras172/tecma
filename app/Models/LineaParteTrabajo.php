@@ -60,4 +60,12 @@ class LineaParteTrabajo extends Model
     {
         return $this->belongsTo(ParteTrabajo::class);
     }
+
+    /**
+     * Usuarios asignados a esta línea de trabajo
+     */
+    public function usuarios()
+    {
+        return $this->belongsToMany(User::class, 'linea_parte_trabajo_user');
+    }
 }

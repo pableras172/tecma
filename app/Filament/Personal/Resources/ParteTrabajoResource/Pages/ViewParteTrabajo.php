@@ -1,33 +1,20 @@
 <?php
 
-namespace App\Filament\Resources\ParteTrabajoResource\Pages;
+namespace App\Filament\Personal\Resources\ParteTrabajoResource\Pages;
 
-use App\Filament\Resources\ParteTrabajoResource;
+use App\Filament\Personal\Resources\ParteTrabajoResource;
 use Filament\Actions;
-use Filament\Resources\Pages\EditRecord;
+use Filament\Resources\Pages\ViewRecord;
 use Torgodly\Html2Media\Actions\Html2MediaAction;
 
-
-class EditParteTrabajo extends EditRecord
+class ViewParteTrabajo extends ViewRecord
 {
     protected static string $resource = ParteTrabajoResource::class;
-
     protected $listeners = ['reloadTotales' => 'reloadFormData'];
-
-    public function reloadFormData(): void
-    {
-        // Recargar el registro desde la base de datos
-        $this->record = $this->record->fresh();
-        
-        // Rellenar el formulario con los nuevos datos
-        $this->fillForm();
-    }
 
     protected function getHeaderActions(): array
     {
         return [
-            //añade un boton de ver el parte. Abrira la vista personalizada del parte
-
             Html2MediaAction::make('print')
                 ->scale(1)
                 ->label('Imprimir parte')
@@ -43,11 +30,13 @@ class EditParteTrabajo extends EditRecord
                 ->enableLinks() // Enable links in PDF
                 ->margin([5, 10, 5, 10]) // Set custom margins
                 ->content(fn($record) => view('filament.resources.parte.parte', ['parte' => $record])),
-            Actions\DeleteAction::make()->icon('heroicon-o-trash')
-                ->label('Eliminar parte de trabajo'),
+            
 
+            Actions\Action::make('volver')
+                ->label('Volver al listado')
+                ->url(route('filament.personal.resources.parte-trabajos.index'))
+                ->color('gray')
+                ->icon('heroicon-o-arrow-left'),
         ];
     }
-
-
 }

@@ -5,6 +5,8 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use TomatoPHP\FilamentSettingsHub\Facades\FilamentSettingsHub;
 use TomatoPHP\FilamentSettingsHub\Services\Contracts\SettingHold;
+use App\Models\User;
+use App\Observers\UserObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -18,7 +20,9 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        FilamentSettingsHub::register([           
+        User::observe(UserObserver::class);
+
+        FilamentSettingsHub::register([
             SettingHold::make()
                 ->order(8)
                 ->label('Países')

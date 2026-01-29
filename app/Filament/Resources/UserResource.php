@@ -17,6 +17,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Illuminate\Support\Collection;
@@ -25,7 +26,10 @@ use App\Models\Province;
 use App\Models\City;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ToggleColumn;
+use Filament\Notifications\Notification;
 use Tapp\FilamentAuditing\RelationManagers\AuditsRelationManager;
+use Spatie\Permission\Models\Role;
 
 class UserResource extends Resource
 {
@@ -48,6 +52,7 @@ class UserResource extends Resource
                     ->columns(3)
                     ->icon('heroicon-o-identification')
                     ->schema([
+
                         FileUpload::make('foto')
                             ->image()
                             ->disk('public')
@@ -94,6 +99,31 @@ class UserResource extends Resource
                             ->label('Departamento')
                             ->required()
                             ->default(fn() => request()->get('departamento_id')),
+                        Select::make('roles')
+                            ->label('Rol')
+                            ->options(Role::pluck('name', 'id'))
+                            ->required()
+                            ->preload()
+                            ->searchable()
+                            ->multiple(false) // si es un solo rol
+                            ->afterStateHydrated(function ($component, $record) {
+                                if (! $record) {
+                                    return;
+                                }
+
+                                $component->state(
+                                    $record->roles->pluck('id')->toArray()
+                                );
+                            })
+                            ->saveRelationshipsUsing(function ($record, $state) {
+                                $roles = Role::whereIn('id', (array) $state)->get();
+                                $record->syncRoles($roles);
+                            }),
+
+                        Toggle::make('active')
+                            ->label('Activo')
+                            ->default(true)
+                            ->inline(false),
                     ]),
 
                 Section::make('Ubicación')
@@ -180,6 +210,16 @@ class UserResource extends Resource
                 TextColumn::make('categoriaProfesional.nombre')
                     ->label('Categoría')
                     ->sortable(),
+
+                ToggleColumn::make('active')
+                    ->label('Activo')
+                    ->sortable()
+                    ->afterStateUpdated(function ($record, $state) {
+                        Notification::make()
+                            ->title($state ? 'Usuario activado' : 'Usuario desactivado')
+                            ->success()
+                            ->send();
+                    }),
             ])
             ->filters([])
             ->actions([

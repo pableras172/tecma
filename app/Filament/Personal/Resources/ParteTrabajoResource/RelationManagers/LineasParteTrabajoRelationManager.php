@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources\ParteTrabajoResource\RelationManagers;
+namespace App\Filament\Personal\Resources\ParteTrabajoResource\RelationManagers;
 
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -31,7 +31,6 @@ class LineasParteTrabajoRelationManager extends RelationManager
     {
         return $form
             ->schema([
-
                 Grid::make(1)->schema([
                     DatePicker::make('fecha')
                         ->required()
@@ -43,24 +42,30 @@ class LineasParteTrabajoRelationManager extends RelationManager
                         ->multiple()
                         ->searchable()
                         ->preload()
+                        ->live()
+                        ->required()
                         ->helperText('Selecciona uno o varios usuarios para esta línea de trabajo'),
                 ]),
                 Grid::make(4)->schema([
                     TimePicker::make('hora_ida')->withoutSeconds()
                         ->label('H. ida')
                         ->reactive()
+                        ->disabled(fn (Get $get) => empty($get('usuarios')))
                         ->afterStateUpdated(fn ($state, Set $set, Get $get) => $this->calcularHVE($set, $get)),
                     TimePicker::make('hora_llegada')->withoutSeconds()
                         ->label('H. llegada')
                         ->reactive()
+                        ->disabled(fn (Get $get) => empty($get('usuarios')))
                         ->afterStateUpdated(fn ($state, Set $set, Get $get) => $this->calcularHVE($set, $get)),
                     TimePicker::make('hora_vuelta')->withoutSeconds()
                         ->label('H. Vuelta')
                         ->reactive()
+                        ->disabled(fn (Get $get) => empty($get('usuarios')))
                         ->afterStateUpdated(fn ($state, Set $set, Get $get) => $this->calcularHVE($set, $get)),
                     TimePicker::make('hora_vuelta_llegada')->withoutSeconds()
                         ->label('H. Vuelta llegada')
                         ->reactive()
+                        ->disabled(fn (Get $get) => empty($get('usuarios')))
                         ->afterStateUpdated(fn ($state, Set $set, Get $get) => $this->calcularHVE($set, $get)),
                 ]),
 
@@ -68,18 +73,22 @@ class LineasParteTrabajoRelationManager extends RelationManager
                     TimePicker::make('hora_inicio_trabajo')->withoutSeconds()
                         ->label('H. inicio t.')
                         ->reactive()
+                        ->disabled(fn (Get $get) => empty($get('usuarios')))
                         ->afterStateUpdated(fn ($state, Set $set, Get $get) => $this->calcularHT1($set, $get)),
                     TimePicker::make('hora_fin_trabajo')->withoutSeconds()
                         ->label('H. fin t.')
                         ->reactive()
+                        ->disabled(fn (Get $get) => empty($get('usuarios')))
                         ->afterStateUpdated(fn ($state, Set $set, Get $get) => $this->calcularHT1($set, $get)),
-                    TimePicker::make('hora_inicio_trabajo2')->withoutSeconds()
+                    TimePicker::make('hora_inicio_trabajo_2')->withoutSeconds()
                         ->label('H. inicio t2.')
                         ->reactive()
+                        ->disabled(fn (Get $get) => empty($get('usuarios')))
                         ->afterStateUpdated(fn ($state, Set $set, Get $get) => $this->calcularHT2($set, $get)),
-                    TimePicker::make('hora_fin_trabajo2')->withoutSeconds()
+                    TimePicker::make('hora_fin_trabajo_2')->withoutSeconds()
                         ->label('H. fin t2.')
                         ->reactive()
+                        ->disabled(fn (Get $get) => empty($get('usuarios')))
                         ->afterStateUpdated(fn ($state, Set $set, Get $get) => $this->calcularHT2($set, $get)),
                 ]),
 
@@ -152,6 +161,7 @@ class LineasParteTrabajoRelationManager extends RelationManager
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make()
+                    ->visible(fn () => $this->getOwnerRecord()->user_responsable_id === auth()->id())
                     ->after(function () {
                         $this->getOwnerRecord()->recalcularTotales();
                         $this->dispatch('reloadTotales');
@@ -159,11 +169,13 @@ class LineasParteTrabajoRelationManager extends RelationManager
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
+                    ->visible(fn () => $this->getOwnerRecord()->user_responsable_id === auth()->id())
                     ->after(function () {
                         $this->getOwnerRecord()->recalcularTotales();
                         $this->dispatch('reloadTotales');
                     }),
                 Tables\Actions\DeleteAction::make()
+                    ->visible(fn () => $this->getOwnerRecord()->user_responsable_id === auth()->id())
                     ->after(function () {
                         $this->getOwnerRecord()->recalcularTotales();
                         $this->dispatch('reloadTotales');
@@ -194,8 +206,8 @@ class LineasParteTrabajoRelationManager extends RelationManager
      */
     protected function calcularHT2(Set $set, Get $get): void
     {
-        $horaInicio = $get('hora_inicio_trabajo2');
-        $horaFin = $get('hora_fin_trabajo2');
+        $horaInicio = $get('hora_inicio_trabajo_2');
+        $horaFin = $get('hora_fin_trabajo_2');
         
         if (!$horaInicio || !$horaFin) {
             $set('ht2', 0);

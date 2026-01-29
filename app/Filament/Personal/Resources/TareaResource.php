@@ -133,7 +133,21 @@ class TareaResource extends Resource
                 TextColumn::make('titulo')->label('Título')->searchable(),
                 TextColumn::make('planta.nombre')->label('Planta')->sortable()->searchable(),
 
-
+                /*TextColumn::make('estado')
+                    ->label('Estado')
+                    ->badge()
+                    ->color(fn(string $state): string => match ($state) {
+                        'pendiente' => 'gray',
+                        'progreso' => 'warning',
+                        'finalizada' => 'success',
+                        default => 'gray',
+                    })
+                    ->formatStateUsing(fn(string $state): string => match ($state) {
+                        'pendiente' => 'Pendiente',
+                        'progreso' => 'En progreso',
+                        'finalizada' => 'Finalizada',
+                        default => ucfirst($state),
+                    }),*/
                 SelectColumn::make('estado')
                     ->label('Estado')
                     ->options([
@@ -144,6 +158,26 @@ class TareaResource extends Resource
                     ->selectablePlaceholder(false)
                     ->sortable()
                     ->searchable(),
+
+
+                TextColumn::make('estado')
+                    ->label('Estado')
+                    ->icon(fn(string $state): string => match ($state) {
+                        'pendiente' => 'heroicon-o-clock',
+                        'progreso' => 'heroicon-o-arrow-path',
+                        'finalizada' => 'heroicon-o-check-circle',
+                    })
+                    ->color(fn(string $state): string => match ($state) {
+                        'pendiente' => 'gray',
+                        'progreso' => 'warning',
+                        'finalizada' => 'success',
+                    })
+                    ->formatStateUsing(fn(string $state): string => match ($state) {
+                        'pendiente' => 'Pendiente',
+                        'progreso' => 'En progreso',
+                        'finalizada' => 'Finalizada',
+                    })
+                    ->sortable(),
 
                 TextColumn::make('usuarios.name')
                     ->label('Usuarios asignados')
@@ -162,8 +196,18 @@ class TareaResource extends Resource
                         'finalizada' => 'Finalizada',
                     ])
             ])
-            ->actions([])
-            ->bulkActions([]);
+            ->actions([
+                Tables\Actions\ViewAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->visible(fn () => auth()->user()->hasRole('admin')),
+                Tables\Actions\DeleteAction::make()
+                    ->visible(fn () => auth()->user()->hasRole('admin')),
+            ])
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                ])->visible(fn () => auth()->user()->hasRole('admin')),
+            ]);
     }
 
     public static function getRelations(): array
@@ -179,6 +223,31 @@ class TareaResource extends Resource
             'index' => Pages\ListTareas::route('/'),
             'create' => Pages\CreateTarea::route('/create'),
             'edit' => Pages\EditTarea::route('/{record}/edit'),
+            'view' => Pages\ViewTarea::route('/{record}'),
         ];
+    }
+
+    /**
+     * Solo admins pueden crear tareas
+     */
+    public static function canCreate(): bool
+    {
+        return auth()->user()->hasRole('admin');
+    }
+
+    /**
+     * Solo admins pueden editar tareas
+     */
+    public static function canEdit($record): bool
+    {
+        return auth()->user()->hasRole('admin');
+    }
+
+    /**
+     * Solo admins pueden eliminar tareas
+     */
+    public static function canDelete($record): bool
+    {
+        return auth()->user()->hasRole('admin');
     }
 }

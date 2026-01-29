@@ -17,6 +17,7 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use App\Http\Middleware\CheckUserActive;
 use TomatoPHP\FilamentSettingsHub\FilamentSettingsHubPlugin;
 use App\Filament\Widgets\TareasPorUsuarioChart;
 use Swis\Filament\Backgrounds\FilamentBackgroundsPlugin;
@@ -24,6 +25,7 @@ use Swis\Filament\Backgrounds\ImageProviders\MyImages;
 use App\Filament\Pages\EditProfile;
 use Filament\Support\Facades\FilamentView;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Validation\ValidationException;
 
 class DashboardPanelProvider extends PanelProvider
 {
@@ -34,10 +36,10 @@ class DashboardPanelProvider extends PanelProvider
             ->default()
             ->id('dashboard')
             ->path('dashboard')
-            ->login()
+            ->login(\App\Filament\Personal\Pages\Login::class)
             ->passwordReset()
             ->emailVerification()
-            ->registration()
+            ->registration()            
             ->profile(EditProfile::class)
             ->colors([
                 'danger' => Color::Rose,
@@ -49,9 +51,9 @@ class DashboardPanelProvider extends PanelProvider
             ])
             ->font('Poppins')
             ->brandName(setting("site_name"))
-            ->brandLogo(fn () => setting("site_logo") ? asset('storage/' . setting("site_logo")) : null)
+            ->brandLogo(fn() => setting("site_logo") ? asset('storage/' . setting("site_logo")) : null)
             ->brandLogoHeight('3rem')
-            ->favicon(fn () => setting("site_profile") ? asset('storage/' . setting("site_profile")) : null)
+            ->favicon(fn() => setting("site_profile") ? asset('storage/' . setting("site_profile")) : null)
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
@@ -80,9 +82,17 @@ class DashboardPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
+                CheckUserActive::class,
             ])
             ->authMiddleware([
                 Authenticate::class,
+            ])
+            ->userMenuItems([
+                'panel_personal' => \Filament\Navigation\MenuItem::make()
+                    ->label('Panel Personal')
+                    ->url(fn () => route('filament.personal.pages.dashboard'))
+                    ->icon('heroicon-o-user')
+                    ->visible(fn () => auth()->user()?->hasRole('admin')),
             ])
             ->unsavedChangesAlerts()
             ->sidebarCollapsibleOnDesktop()
@@ -93,7 +103,7 @@ class DashboardPanelProvider extends PanelProvider
     {
         FilamentView::registerRenderHook(
             'panels::head.end',
-            fn (): string => Blade::render(<<<'HTML'
+            fn(): string => Blade::render(<<<'HTML'
                 <link rel="manifest" href="/manifest.json">
                 <meta name="theme-color" content="#4f46e5">
                 <meta name="apple-mobile-web-app-capable" content="yes">
