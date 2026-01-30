@@ -2,11 +2,21 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\DepartamentoResource\RelationManagers\UsuariosRelationManager;
+use App\Filament\Resources\DepartamentoResource\Pages\ListDepartamentos;
+use App\Filament\Resources\DepartamentoResource\Pages\CreateDepartamento;
+use App\Filament\Resources\DepartamentoResource\Pages\EditDepartamento;
 use App\Filament\Resources\DepartamentoResource\Pages;
 use App\Filament\Resources\DepartamentoResource\RelationManagers;
 use App\Models\Departamento;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -17,8 +27,8 @@ class DepartamentoResource extends Resource
 {
     protected static ?string $model = Departamento::class;
 
-    protected static ?string $navigationGroup = 'Gestión de empleados';
-    protected static ?string $navigationIcon = 'heroicon-o-building-office';
+    protected static string | \UnitEnum | null $navigationGroup = 'Gestión de empleados';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-building-office';
 
     protected static ?string $navigationLabel = 'Departamentos';
     protected static ?string $modelLabel = 'Departamento';
@@ -27,14 +37,14 @@ class DepartamentoResource extends Resource
     protected static bool $shouldRegisterNavigation = false;
 
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('nombre')
+        return $schema
+            ->components([
+                TextInput::make('nombre')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\Textarea::make('descripcion')
+                Textarea::make('descripcion')
                     ->columnSpanFull(),
             ]);
     }
@@ -43,13 +53,13 @@ class DepartamentoResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('nombre')
+                TextColumn::make('nombre')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -57,12 +67,12 @@ class DepartamentoResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -70,7 +80,7 @@ class DepartamentoResource extends Resource
     public static function getRelations(): array
     {
         return [
-            RelationManagers\UsuariosRelationManager::class,
+            UsuariosRelationManager::class,
         ];
     }
 
@@ -78,9 +88,9 @@ class DepartamentoResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListDepartamentos::route('/'),
-            'create' => Pages\CreateDepartamento::route('/create'),
-            'edit' => Pages\EditDepartamento::route('/{record}/edit'),
+            'index' => ListDepartamentos::route('/'),
+            'create' => CreateDepartamento::route('/create'),
+            'edit' => EditDepartamento::route('/{record}/edit'),
         ];
     }
 }

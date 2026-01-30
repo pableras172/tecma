@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Log;
+use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -13,7 +15,7 @@ use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements FilamentUser, HasAvatar,Auditable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
+    /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable, HasRoles;
     use \OwenIt\Auditing\Auditable;
 
@@ -99,7 +101,7 @@ class User extends Authenticatable implements FilamentUser, HasAvatar,Auditable
         }
 
         //Mostrar en el log el id del panel
-        \Log::info('Panel Access Attempt', [
+        Log::info('Panel Access Attempt', [
             'panel_id' => $panel->getId(),
             'user_id' => $this->id,
             'user_email' => $this->email,

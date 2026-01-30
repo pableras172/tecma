@@ -2,22 +2,30 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Set;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\ClienteResource\Pages\ListClientes;
+use App\Filament\Resources\ClienteResource\Pages\CreateCliente;
+use App\Filament\Resources\ClienteResource\Pages\EditCliente;
+use App\Filament\Resources\ClienteResource\RelationManagers\PlantasRelationManager;
 use App\Filament\Resources\ClienteResource\Pages;
 use App\Filament\Resources\ClienteResource\RelationManagers;
 use App\Models\Cliente;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Get;
-use Filament\Forms\Set;
 use App\Models\Country;
 use App\Models\Province;
 use App\Models\City;
@@ -28,18 +36,18 @@ use Filament\Tables\Columns\ImageColumn;
 class ClienteResource extends Resource
 {
     protected static ?string $model = Cliente::class;
-    protected static ?string $navigationGroup = 'Mantenimiento de clientes';
-    protected static ?string $navigationIcon = 'heroicon-o-user-group'; // ícono tipo "cliente"
+    protected static string | \UnitEnum | null $navigationGroup = 'Mantenimiento de clientes';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-user-group'; // ícono tipo "cliente"
     protected static ?string $navigationLabel = 'Clientes';
     protected static ?string $modelLabel = 'Cliente';
     protected static ?string $pluralModelLabel = 'Clientes';
 
     protected static bool $shouldRegisterNavigation = false;
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 Section::make('Datos del cliente')
                     ->columns(3)
                     ->icon('heroicon-o-identification')
@@ -148,26 +156,26 @@ class ClienteResource extends Resource
                     ->disk('public')
                     ->height(40)
                     ->circular(),
-                Tables\Columns\TextColumn::make('nombre')
+                TextColumn::make('nombre')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('direccion')
+                TextColumn::make('direccion')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('city_id')
+                TextColumn::make('city_id')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('telefono1')
+                TextColumn::make('telefono1')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('telefono2')
+                TextColumn::make('telefono2')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('contacto')
+                TextColumn::make('contacto')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('email')
+                TextColumn::make('email')
                     ->searchable(),                
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -175,12 +183,12 @@ class ClienteResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -188,16 +196,16 @@ class ClienteResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListClientes::route('/'),
-            'create' => Pages\CreateCliente::route('/create'),
-            'edit' => Pages\EditCliente::route('/{record}/edit'),
+            'index' => ListClientes::route('/'),
+            'create' => CreateCliente::route('/create'),
+            'edit' => EditCliente::route('/{record}/edit'),
         ];
     }
 
     public static function getRelations(): array
     {
         return [
-            RelationManagers\PlantasRelationManager::class,
+            PlantasRelationManager::class,
         ];
     }
 }

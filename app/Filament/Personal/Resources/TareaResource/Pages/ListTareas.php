@@ -2,6 +2,7 @@
 
 namespace App\Filament\Personal\Resources\TareaResource\Pages;
 
+use Filament\Actions\CreateAction;
 use App\Filament\Personal\Resources\TareaResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
@@ -13,7 +14,7 @@ class ListTareas extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

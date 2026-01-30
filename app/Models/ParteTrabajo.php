@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use OwenIt\Auditing\Contracts\Auditable;
@@ -140,18 +141,18 @@ class ParteTrabajo extends Model implements Auditable
         foreach ($lineas as $linea) {
             // Calcular horas de viaje
             if ($linea->hora_ida && $linea->hora_llegada) {
-                $totalHorasViaje += \Carbon\Carbon::parse($linea->hora_ida)->diffInMinutes(\Carbon\Carbon::parse($linea->hora_llegada)) / 60;
+                $totalHorasViaje += Carbon::parse($linea->hora_ida)->diffInMinutes(Carbon::parse($linea->hora_llegada)) / 60;
             }
             if ($linea->hora_vuelta && $linea->hora_vuelta_llegada) {
-                $totalHorasViaje += \Carbon\Carbon::parse($linea->hora_vuelta)->diffInMinutes(\Carbon\Carbon::parse($linea->hora_vuelta_llegada)) / 60;
+                $totalHorasViaje += Carbon::parse($linea->hora_vuelta)->diffInMinutes(Carbon::parse($linea->hora_vuelta_llegada)) / 60;
             }
 
             // Calcular horas de trabajo
             if ($linea->hora_inicio_trabajo && $linea->hora_fin_trabajo) {
-                $totalHorasTrabajo += \Carbon\Carbon::parse($linea->hora_inicio_trabajo)->diffInMinutes(\Carbon\Carbon::parse($linea->hora_fin_trabajo)) / 60;
+                $totalHorasTrabajo += Carbon::parse($linea->hora_inicio_trabajo)->diffInMinutes(Carbon::parse($linea->hora_fin_trabajo)) / 60;
             }
             if ($linea->hora_inicio_trabajo_2 && $linea->hora_fin_trabajo_2) {
-                $totalHorasTrabajo += \Carbon\Carbon::parse($linea->hora_inicio_trabajo_2)->diffInMinutes(\Carbon\Carbon::parse($linea->hora_fin_trabajo_2)) / 60;
+                $totalHorasTrabajo += Carbon::parse($linea->hora_inicio_trabajo_2)->diffInMinutes(Carbon::parse($linea->hora_fin_trabajo_2)) / 60;
             }
         }
 

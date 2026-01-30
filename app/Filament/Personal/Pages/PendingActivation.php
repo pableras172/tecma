@@ -6,7 +6,7 @@ use Filament\Pages\Page;
 
 class PendingActivation extends Page
 {
-    protected static string $view = 'filament.personal.pages.pending-activation';
+    protected string $view = 'filament.personal.pages.pending-activation';
 
     protected static bool $shouldRegisterNavigation = false;
 

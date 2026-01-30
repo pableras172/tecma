@@ -2,24 +2,24 @@
 
 namespace App\Filament\Personal\Pages;
 
-use Filament\Pages\Auth\Login as BaseLogin;
+use Log;
 
-class Login extends BaseLogin
+class Login extends \Filament\Auth\Pages\Login
 {
     protected function getRedirectUrl(): ?string
     {
         $user = auth()->user();
 
         if($user) {
-            \Log::info('User logged in', [           
+            Log::info('User logged in', [           
                 'user_id' =>  $user->id,
                 'user_email' =>  $user->email,
             ]);
 
         }else{
-            \Log::info('No user logged in');
+            Log::info('No user logged in');
         }
-        
+
         if (! $user) {
             return null;
         }

@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Auth;
 
 class TareasUsuarioChart extends ChartWidget
 {
-    protected static ?string $heading = 'Tareas por estado';
+    protected ?string $heading = 'Tareas por estado';
     
 
     // o para más control por breakpoints:

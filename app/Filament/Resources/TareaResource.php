@@ -2,11 +2,18 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\TareaResource\Pages\ListTareas;
+use App\Filament\Resources\TareaResource\Pages\CreateTarea;
+use App\Filament\Resources\TareaResource\Pages\EditTarea;
 use App\Filament\Resources\TareaResource\Pages;
 use App\Filament\Resources\TareaResource\RelationManagers;
 use App\Models\Tarea;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -16,7 +23,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Section;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\SelectColumn;
@@ -26,14 +32,14 @@ class TareaResource extends Resource
 {
     protected static ?string $model = Tarea::class;
 
-    protected static ?string $navigationGroup = 'Gestión de tareas';
-    protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-check';
+    protected static string | \UnitEnum | null $navigationGroup = 'Gestión de tareas';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-clipboard-document-check';
 
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 Section::make('Información de la tarea')
                     ->columns(2)
                     ->schema([
@@ -159,12 +165,12 @@ class TareaResource extends Resource
                         'finalizada' => 'Finalizada',
                     ])
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -179,9 +185,9 @@ class TareaResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListTareas::route('/'),
-            'create' => Pages\CreateTarea::route('/create'),
-            'edit' => Pages\EditTarea::route('/{record}/edit'),
+            'index' => ListTareas::route('/'),
+            'create' => CreateTarea::route('/create'),
+            'edit' => EditTarea::route('/{record}/edit'),
         ];
     }
 }

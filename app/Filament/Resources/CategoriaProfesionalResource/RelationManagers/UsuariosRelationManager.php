@@ -2,17 +2,19 @@
 
 namespace App\Filament\Resources\CategoriaProfesionalResource\RelationManagers;
 
+use Filament\Tables\Table;
+use Filament\Actions\Action;
+use Filament\Actions\ViewAction;
 use Filament\Tables;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Actions\Action;
 
 class UsuariosRelationManager extends RelationManager
 {
     protected static string $relationship = 'usuarios';
     protected static ?string $title = '🎓 Empleados con esta categoría';
 
-    public function table(Tables\Table $table): Tables\Table
+    public function table(Table $table): Table
     {
         return $table
             ->recordUrl(fn($record) => route('filament.dashboard.resources.users.edit', ['record' => $record]))
@@ -31,8 +33,8 @@ class UsuariosRelationManager extends RelationManager
                     ]))
                     ,
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make()
+            ->recordActions([
+                ViewAction::make()
                     ->modalHeading('Detalle del empleado'),
 
                 Action::make('editar')

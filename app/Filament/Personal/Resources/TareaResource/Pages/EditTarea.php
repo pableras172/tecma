@@ -2,6 +2,7 @@
 
 namespace App\Filament\Personal\Resources\TareaResource\Pages;
 
+use Filament\Actions\DeleteAction;
 use App\Filament\Personal\Resources\TareaResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
@@ -13,7 +14,7 @@ class EditTarea extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 }

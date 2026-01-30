@@ -2,8 +2,12 @@
 
 namespace App\Filament\Resources\ClienteResource\RelationManagers;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Actions\Action;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -17,17 +21,17 @@ class PlantasRelationManager extends RelationManager
     protected static ?string $title = 'Plantas asociadas';
 
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('Plantas')
+        return $schema
+            ->components([
+                TextInput::make('Plantas')
                     ->required()
                     ->maxLength(255),
             ]);
     }
 
-    public function table(Tables\Table $table): Tables\Table
+    public function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -42,22 +46,22 @@ class PlantasRelationManager extends RelationManager
 
             ->filters([])
             ->headerActions([
-                Tables\Actions\Action::make('crear')
+                Action::make('crear')
                 ->label('Crear planta')
                 ->icon('heroicon-o-plus')
                 ->url(fn ($livewire) => route('filament.dashboard.resources.plantas.create', [
                     'cliente_id' => $livewire->getOwnerRecord()->id,
                 ])),
             ])
-            ->actions([
-                Tables\Actions\Action::make('editar')
+            ->recordActions([
+                Action::make('editar')
                     ->label('Editar')
                     ->icon('heroicon-o-pencil-square')
                     ->url(fn($record) => route('filament.dashboard.resources.plantas.edit', ['record' => $record])),
-                Tables\Actions\DeleteAction::make(),
+                DeleteAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                DeleteBulkAction::make(),
             ]);
     }
 

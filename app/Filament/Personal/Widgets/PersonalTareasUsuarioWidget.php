@@ -15,7 +15,7 @@ class PersonalTareasUsuarioWidget extends BaseWidget
         $userId = Auth::id();
 
         // Determinar el panel actual y la ruta correspondiente
-        $panelId = Filament::getCurrentPanel()->getId();
+        $panelId = Filament::getCurrentOrDefaultPanel()->getId();
         $tareasUrl = $panelId === 'dashboard' ? '/dashboard/tareas' : '/personal/tareas';
 
         $tareasPendientes = Tarea::where('estado', 'pendiente')

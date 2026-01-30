@@ -8,7 +8,7 @@ use App\Models\ParteTrabajo;
 
 class PartesEstadoChart extends ChartWidget
 {
-    protected static ?string $heading = 'Partes de trabajo por estado';
+    protected ?string $heading = 'Partes de trabajo por estado';
 
     protected static array $columns = [
         'default' => 1,

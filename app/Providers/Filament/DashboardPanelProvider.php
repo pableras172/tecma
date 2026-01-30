@@ -2,6 +2,11 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Personal\Pages\Login;
+use Filament\Pages\Dashboard;
+use App\Filament\Personal\Widgets\PersonalTareasUsuarioWidget;
+use App\Filament\Widgets\PartesUsuarioChart;
+use Filament\Navigation\MenuItem;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -36,7 +41,7 @@ class DashboardPanelProvider extends PanelProvider
             ->default()
             ->id('dashboard')
             ->path('dashboard')
-            ->login(\App\Filament\Personal\Pages\Login::class)
+            ->login(Login::class)
             ->passwordReset()
             ->emailVerification()
             ->registration()            
@@ -57,7 +62,7 @@ class DashboardPanelProvider extends PanelProvider
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
-                Pages\Dashboard::class,
+                Dashboard::class,
             ])
             ->plugin(
                 FilamentSettingsHubPlugin::make()
@@ -69,9 +74,9 @@ class DashboardPanelProvider extends PanelProvider
             )
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
-                \App\Filament\Personal\Widgets\PersonalTareasUsuarioWidget::class,
+                PersonalTareasUsuarioWidget::class,
                 TareasPorUsuarioChart::class,
-                \App\Filament\Widgets\PartesUsuarioChart::class,
+                PartesUsuarioChart::class,
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -89,7 +94,7 @@ class DashboardPanelProvider extends PanelProvider
                 Authenticate::class,
             ])
             ->userMenuItems([
-                'panel_personal' => \Filament\Navigation\MenuItem::make()
+                'panel_personal' => MenuItem::make()
                     ->label('Panel Personal')
                     ->url(fn () => route('filament.personal.pages.dashboard'))
                     ->icon('heroicon-o-user')

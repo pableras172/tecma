@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\ParteTrabajoResource\Pages;
 
+use Filament\Actions\DeleteAction;
 use App\Filament\Resources\ParteTrabajoResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
@@ -43,7 +44,7 @@ class EditParteTrabajo extends EditRecord
                 ->enableLinks() // Enable links in PDF
                 ->margin([5, 10, 5, 10]) // Set custom margins
                 ->content(fn($record) => view('filament.resources.parte.parte', ['parte' => $record])),
-            Actions\DeleteAction::make()->icon('heroicon-o-trash')
+            DeleteAction::make()->icon('heroicon-o-trash')
                 ->label('Eliminar parte de trabajo'),
 
         ];

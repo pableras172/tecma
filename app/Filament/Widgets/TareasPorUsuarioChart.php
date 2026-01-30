@@ -7,8 +7,8 @@ use Filament\Widgets\ChartWidget;
 
 class TareasPorUsuarioChart extends ChartWidget
 {
-    protected static ?string $heading = 'Tareas por usuario';
-    protected static ?string $pollingInterval = null; // desactiva auto-refresh
+    protected ?string $heading = 'Tareas por usuario';
+    protected ?string $pollingInterval = null; // desactiva auto-refresh
     protected static ?int $sort = 1;
 
     protected function getType(): string

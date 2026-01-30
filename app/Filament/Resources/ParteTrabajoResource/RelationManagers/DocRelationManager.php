@@ -2,8 +2,19 @@
 
 namespace App\Filament\Resources\ParteTrabajoResource\RelationManagers;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\FileUpload;
+use Filament\Schemas\Components\Utilities\Set;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\DatePicker;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\CreateAction;
+use Filament\Actions\Action;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -19,11 +30,11 @@ class DocRelationManager extends RelationManager
     protected static ?string $modelLabel = 'Informe';
     protected static ?string $pluralModelLabel = 'Informes';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\FileUpload::make('ruta')
+        return $schema
+            ->components([
+                FileUpload::make('ruta')
                     ->label('Subir Documento')
                     ->acceptedFileTypes(['application/pdf'])
                     ->directory(fn () => 'documentos/' . date('Y'))
@@ -31,7 +42,7 @@ class DocRelationManager extends RelationManager
                     ->maxSize(10240)
                     ->required()
                     ->preserveFilenames()
-                    ->afterStateUpdated(function ($state, Forms\Set $set) {
+                    ->afterStateUpdated(function ($state, Set $set) {
                         if ($state) {
                             // Si es un objeto TemporaryUploadedFile
                             if (is_object($state)) {
@@ -50,14 +61,14 @@ class DocRelationManager extends RelationManager
                     })
                     ->columnSpanFull(),
 
-                Forms\Components\TextInput::make('nombre_documento')
+                TextInput::make('nombre_documento')
                     ->label('Nombre del Documento')
                     ->disabled()
                     ->dehydrated()
                     ->required()
                     ->maxLength(255),
 
-                Forms\Components\DatePicker::make('fecha')
+                DatePicker::make('fecha')
                     ->label('Fecha')
                     ->disabled()
                     ->dehydrated()
@@ -71,15 +82,15 @@ class DocRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('nombre_documento')
             ->columns([
-                Tables\Columns\TextColumn::make('nombre_documento')
+                TextColumn::make('nombre_documento')
                     ->label('Documento')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('fecha')
+                TextColumn::make('fecha')
                     ->label('Fecha')
                     ->date('d/m/Y')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('ruta')
+                TextColumn::make('ruta')
                     ->label('Archivo')
                     ->formatStateUsing(fn ($state) => basename($state))
                     ->url(fn ($record) => asset('storage/' . $record->ruta))
@@ -90,11 +101,11 @@ class DocRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make()
+                CreateAction::make()
                     ->label('Subir Documento'),
             ])
-            ->actions([
-                Tables\Actions\Action::make('ver')
+            ->recordActions([
+                Action::make('ver')
                     ->label('Ver PDF')
                     ->icon('heroicon-o-eye')
                     ->modalHeading(fn ($record) => $record->nombre_documento)
@@ -104,17 +115,17 @@ class DocRelationManager extends RelationManager
                     ]))
                     ->modalSubmitAction(false)
                     ->modalCancelActionLabel('Cerrar'),
-                Tables\Actions\Action::make('descargar')
+                Action::make('descargar')
                     ->label('Descargar')
                     ->icon('heroicon-o-arrow-down-tray')
                     ->url(fn ($record) => asset('storage/' . $record->ruta))
                     ->openUrlInNewTab(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('created_at', 'desc');

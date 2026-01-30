@@ -2,9 +2,7 @@
 
 namespace App\Filament\Personal\Pages;
 
-use Filament\Pages\Auth\Register as BaseRegister;
-
-class Register extends BaseRegister
+class Register extends \Filament\Auth\Pages\Register
 {
     /**
      * Evita el auto-login tras el registro

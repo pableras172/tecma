@@ -2,11 +2,19 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\CountryResource\Pages\ListCountries;
+use App\Filament\Resources\CountryResource\Pages\CreateCountry;
+use App\Filament\Resources\CountryResource\Pages\EditCountry;
 use App\Filament\Resources\CountryResource\Pages;
 use App\Filament\Resources\CountryResource\RelationManagers;
 use App\Models\Country;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -17,8 +25,8 @@ class CountryResource extends Resource
 {
     protected static ?string $model = Country::class;
 
-    protected static ?string $navigationGroup = 'Ubicación';
-    protected static ?string $navigationIcon = 'heroicon-o-globe-alt';
+    protected static string | \UnitEnum | null $navigationGroup = 'Ubicación';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-globe-alt';
     
     protected static ?string $navigationLabel = 'Paises';
     protected static ?string $modelLabel = 'Paises';
@@ -27,14 +35,14 @@ class CountryResource extends Resource
     protected static bool $shouldRegisterNavigation = false;
 
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('name')
+        return $schema
+            ->components([
+                TextInput::make('name')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('iso2')
+                TextInput::make('iso2')
                     ->required()
                     ->maxLength(255),
             ]);
@@ -44,15 +52,15 @@ class CountryResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
+                TextColumn::make('name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('iso2')
+                TextColumn::make('iso2')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -60,12 +68,12 @@ class CountryResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -80,9 +88,9 @@ class CountryResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCountries::route('/'),
-            'create' => Pages\CreateCountry::route('/create'),
-            'edit' => Pages\EditCountry::route('/{record}/edit'),
+            'index' => ListCountries::route('/'),
+            'create' => CreateCountry::route('/create'),
+            'edit' => EditCountry::route('/{record}/edit'),
         ];
     }
 }

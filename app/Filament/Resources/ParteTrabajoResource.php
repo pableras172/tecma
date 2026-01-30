@@ -3,12 +3,33 @@
 namespace App\Filament\Resources;
 
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Group;
+use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Select;
+use App\Models\Planta;
+use App\Models\TipoTrabajo;
+use Filament\Forms\Components\Textarea;
+use App\Models\User;
+use Storage;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\ParteTrabajoResource\Pages\ListParteTrabajos;
+use App\Filament\Resources\ParteTrabajoResource\Pages\CreateParteTrabajo;
+use App\Filament\Resources\ParteTrabajoResource\Pages\EditParteTrabajo;
 use App\Filament\Resources\ParteTrabajoResource\Pages;
 use App\Filament\Resources\ParteTrabajoResource\RelationManagers;
 use App\Filament\Resources\ParteTrabajoResource\RelationManagers\DocRelationManager;
 use App\Models\ParteTrabajo;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -17,43 +38,42 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\ParteTrabajoResource\RelationManagers\LineasParteTrabajoRelationManager;
 use Saade\FilamentAutograph\Forms\Components\SignaturePad;
 use Filament\Forms\Actions\Action;
-use Filament\Forms\Components\Tabs;
 
 
 class ParteTrabajoResource extends Resource
 {
     protected static ?string $model = ParteTrabajo::class;
-    protected static ?string $navigationGroup = 'Gestión de tareas';
-    protected static ?string $navigationIcon = 'heroicon-o-briefcase';
+    protected static string | \UnitEnum | null $navigationGroup = 'Gestión de tareas';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-briefcase';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 Tabs::make('Tabs')
                     ->tabs([
-                        Tabs\Tab::make('Datos Generales')
+                        Tab::make('Datos Generales')
                             ->icon('heroicon-o-document-text')
                             ->schema([
                                 // Primera línea: Parte de trabajo y Datos del cliente
-                                Forms\Components\Grid::make([
+                                Grid::make([
                                     'default' => 1,
                                     'md' => 2,
                                 ])->schema([
-                                    Forms\Components\Group::make([
-                                        Forms\Components\Section::make('Parte de trabajo')
+                                    Group::make([
+                                        Section::make('Parte de trabajo')
                                             ->schema([
-                                                Forms\Components\TextInput::make('numero')
+                                                TextInput::make('numero')
                                                     ->required()
                                                     ->maxLength(255)
                                                     ->unique(ignoreRecord: true)
                                                     ->validationMessages([
                                                         'unique' => 'Este número de parte ya existe.',
                                                     ]),
-                                                Forms\Components\DatePicker::make('fecha_parte')
+                                                DatePicker::make('fecha_parte')
                                                     ->required(),
                                                 // El resto sigue igual
-                                                Forms\Components\Select::make('estado')
+                                                Select::make('estado')
                                                     ->label('Estado')
                                                     ->options([
                                                         'borrador' => 'Borrador',
@@ -64,30 +84,30 @@ class ParteTrabajoResource extends Resource
                                             ])
                                             ->columnSpanFull(),
                                     ]),
-                                    Forms\Components\Group::make([
-                                        Forms\Components\Section::make('Datos del cliente')
+                                    Group::make([
+                                        Section::make('Datos del cliente')
                                             ->schema([
-                                                Forms\Components\Select::make('cliente_id')
+                                                Select::make('cliente_id')
                                                     ->label('Cliente')
                                                     ->relationship('cliente', 'nombre')
                                                     ->required()
                                                     ->reactive(),
-                                                Forms\Components\Select::make('planta_id')
+                                                Select::make('planta_id')
                                                     ->label('Planta')
                                                     ->options(function (callable $get) {
                                                         $clienteId = $get('cliente_id');
                                                         if (!$clienteId) {
                                                             return [];
                                                         }
-                                                        return \App\Models\Planta::where('cliente_id', $clienteId)
+                                                        return Planta::where('cliente_id', $clienteId)
                                                             ->pluck('nombre', 'id')
                                                             ->toArray();
                                                     })
                                                     ->required()
                                                     ->reactive(),
-                                                Forms\Components\Select::make('tipo_trabajo_id')
+                                                Select::make('tipo_trabajo_id')
                                                     ->label('Tipo de Trabajo')
-                                                    ->options(\App\Models\TipoTrabajo::pluck('nombre', 'id')->toArray())
+                                                    ->options(TipoTrabajo::pluck('nombre', 'id')->toArray())
                                                     ->required()
                                                     ->reactive(),
                                             ]),
@@ -95,106 +115,106 @@ class ParteTrabajoResource extends Resource
                                 ]),
 
                                 // Segunda línea: Datos del motor y Trabajo realizado por
-                                Forms\Components\Grid::make([
+                                Grid::make([
                                     'default' => 1,
                                     'md' => 2,
                                 ])->schema([
-                                    Forms\Components\Group::make([
-                                        Forms\Components\Section::make('Datos del Motor')
+                                    Group::make([
+                                        Section::make('Datos del Motor')
                                             ->schema([
-                                                Forms\Components\Grid::make(4)
+                                                Grid::make(4)
                                                     ->schema([
-                                                        Forms\Components\TextInput::make('horas_motor')
+                                                        TextInput::make('horas_motor')
                                                             ->numeric()
                                                             ->required(),
-                                                        Forms\Components\TextInput::make('arranques')
+                                                        TextInput::make('arranques')
                                                             ->numeric()
                                                             ->required(),
-                                                        Forms\Components\TextInput::make('modelo')
+                                                        TextInput::make('modelo')
                                                             ->maxLength(255)
                                                             ->required(),
-                                                        Forms\Components\TextInput::make('numero_motor')
+                                                        TextInput::make('numero_motor')
                                                             ->maxLength(255)
                                                             ->required(),
                                                     ]),
-                                                Forms\Components\Textarea::make('comentarios')
+                                                Textarea::make('comentarios')
                                                     ->columnSpanFull(),
                                             ]),
                                     ]),
-                                    Forms\Components\Group::make([
-                                        Forms\Components\Section::make('Trabajo realizado por:')
+                                    Group::make([
+                                        Section::make('Trabajo realizado por:')
                                             ->schema([
-                                                Forms\Components\Select::make('user_responsable_id')
+                                                Select::make('user_responsable_id')
                                                     ->label('Responsable')
-                                                    ->options(\App\Models\User::pluck('name', 'id')->toArray())
+                                                    ->options(User::pluck('name', 'id')->toArray())
                                                     ->searchable()
                                                     ->required(),
-                                                Forms\Components\Textarea::make('trabajo_realizado')
+                                                Textarea::make('trabajo_realizado')
                                                     ->columnSpanFull(),
                                             ]),
                                     ]),
                                 ]),
                             ]),
 
-                        Tabs\Tab::make('Resumen')
+                        Tab::make('Resumen')
                             ->icon('heroicon-o-calculator')
                             ->schema([
-                                Forms\Components\Section::make('Resumen del trabajo')
+                                Section::make('Resumen del trabajo')
                                     ->description('Estos valores se calculan automáticamente desde las líneas de trabajo')
                                     ->schema([
-                                        Forms\Components\Grid::make([
+                                        Grid::make([
                                             'default' => 4,
                                             'md' => 10,
                                         ])->schema([
-                                            Forms\Components\TextInput::make('total_horas_viaje')
+                                            TextInput::make('total_horas_viaje')
                                                 ->label('H.V.')
                                                 ->numeric()
                                                 ->default(0.00)
                                                 ->disabled()
                                                 ->dehydrated(),
-                                            Forms\Components\TextInput::make('total_horas_trabajo')
+                                            TextInput::make('total_horas_trabajo')
                                                 ->label('H.T.')
                                                 ->numeric()
                                                 ->default(0.00)
                                                 ->disabled()
                                                 ->dehydrated(),
-                                            Forms\Components\TextInput::make('total_ht1')
+                                            TextInput::make('total_ht1')
                                                 ->label('HT1')
                                                 ->numeric()
                                                 ->default(0.00)
                                                 ->disabled()
                                                 ->dehydrated(),
-                                            Forms\Components\TextInput::make('total_ht2')
+                                            TextInput::make('total_ht2')
                                                 ->label('HT2')
                                                 ->numeric()
                                                 ->default(0.00)
                                                 ->disabled()
                                                 ->dehydrated(),
-                                            Forms\Components\TextInput::make('total_hve')
+                                            TextInput::make('total_hve')
                                                 ->label('HVE')
                                                 ->numeric()
                                                 ->default(0.00)
                                                 ->disabled()
                                                 ->dehydrated(),
-                                            Forms\Components\TextInput::make('total_km')
+                                            TextInput::make('total_km')
                                                 ->label('Kms')
                                                 ->numeric()
                                                 ->default(0)
                                                 ->disabled()
                                                 ->dehydrated(),
-                                            Forms\Components\TextInput::make('total_media_dieta')
+                                            TextInput::make('total_media_dieta')
                                                 ->label('M/D')
                                                 ->numeric()
                                                 ->default(0)
                                                 ->disabled()
                                                 ->dehydrated(),
-                                            Forms\Components\TextInput::make('total_dieta')
+                                            TextInput::make('total_dieta')
                                                 ->label('D/C')
                                                 ->numeric()
                                                 ->default(0)
                                                 ->disabled()
                                                 ->dehydrated(),
-                                            Forms\Components\TextInput::make('total_hotel')
+                                            TextInput::make('total_hotel')
                                                 ->label('Hotel')
                                                 ->numeric()
                                                 ->default(0)
@@ -204,12 +224,12 @@ class ParteTrabajoResource extends Resource
                                     ]),
                             ]),
 
-                        Tabs\Tab::make('Firmas')
+                        Tab::make('Firmas')
                             ->icon('heroicon-o-pencil-square')
                             ->schema([
-                                Forms\Components\Section::make('Firmas')
+                                Section::make('Firmas')
                                     ->schema([
-                                        Forms\Components\Grid::make([
+                                        Grid::make([
                                             'default' => 1,
                                             'md' => 2,
                                         ])->schema([
@@ -254,7 +274,7 @@ class ParteTrabajoResource extends Resource
                                                             return null;
                                                         }
                                                         $fileName = 'firmas/' . uniqid('firma_tecnico_') . '.png';
-                                                        \Storage::disk('public')->put($fileName, $imageData);
+                                                        Storage::disk('public')->put($fileName, $imageData);
                                                         return $fileName;
                                                     }
                                                     // Si es URL pública, extraer solo el path
@@ -302,7 +322,7 @@ class ParteTrabajoResource extends Resource
                                                             return null;
                                                         }
                                                         $fileName = 'firmas/' . uniqid('firma_supervisor_') . '.png';
-                                                        \Storage::disk('public')->put($fileName, $imageData);
+                                                        Storage::disk('public')->put($fileName, $imageData);
                                                         return $fileName;
                                                     }
                                                     if (str_starts_with($state, 'http')) {
@@ -325,33 +345,33 @@ class ParteTrabajoResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('numero')
+                TextColumn::make('numero')
                     ->label('Número')
                     ->searchable()
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('fecha_parte')
+                TextColumn::make('fecha_parte')
                     ->label('Fecha')
                     ->date('d/m/Y')
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('cliente.nombre')
+                TextColumn::make('cliente.nombre')
                     ->label('Cliente')
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('planta.nombre')
+                TextColumn::make('planta.nombre')
                     ->label('Planta')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('tipoTrabajo.nombre')
+                TextColumn::make('tipoTrabajo.nombre')
                     ->label('Tipo de Trabajo')
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('creador.name')
+                TextColumn::make('creador.name')
                     ->label('Responsable')
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('estado'),
-                Tables\Columns\TextColumn::make('estado')
+                TextColumn::make('estado'),
+                TextColumn::make('estado')
                     ->label('Estado')
                     ->icon(fn(string $state): ?string => match ($state) {
                         'borrador' => 'heroicon-o-pencil',
@@ -375,17 +395,17 @@ class ParteTrabajoResource extends Resource
 
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('cliente_id')
+                SelectFilter::make('cliente_id')
                     ->label('Cliente')
                     ->relationship('cliente', 'nombre')
                     ->searchable()
                     ->preload(),
-                Tables\Filters\SelectFilter::make('user_responsable_id')
+                SelectFilter::make('user_responsable_id')
                     ->label('Responsable')
                     ->relationship('creador', 'name')
                     ->searchable()
                     ->preload(),
-                Tables\Filters\SelectFilter::make('estado')
+                SelectFilter::make('estado')
                     ->label('Estado')
                     ->options([
                         'borrador' => 'Borrador',
@@ -394,14 +414,14 @@ class ParteTrabajoResource extends Resource
                     ]),
             ])
             ->searchPlaceholder('Buscar:')
-            ->actions([
-                Tables\Actions\EditAction::make()
+            ->recordActions([
+                EditAction::make()
                     ->label('Editar'),
 
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make()
                         ->label('Eliminar seleccionados'),
                 ]),
             ]);
@@ -420,9 +440,9 @@ class ParteTrabajoResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListParteTrabajos::route('/'),
-            'create' => Pages\CreateParteTrabajo::route('/create'),
-            'edit' => Pages\EditParteTrabajo::route('/{record}/edit'),
+            'index' => ListParteTrabajos::route('/'),
+            'create' => CreateParteTrabajo::route('/create'),
+            'edit' => EditParteTrabajo::route('/{record}/edit'),
         ];
     }
 }

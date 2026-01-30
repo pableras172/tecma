@@ -2,6 +2,7 @@
 
 namespace App\Filament\Personal\Resources\ParteTrabajoResource\Pages;
 
+use Filament\Actions\DeleteAction;
 use App\Filament\Personal\Resources\ParteTrabajoResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
@@ -24,7 +25,7 @@ class EditParteTrabajo extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 }

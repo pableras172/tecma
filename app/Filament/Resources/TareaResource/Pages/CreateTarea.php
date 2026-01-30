@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\TareaResource\Pages;
 
+use Filament\Actions\Action;
 use App\Filament\Resources\TareaResource;
 use Filament\Resources\Pages\CreateRecord;
 use Filament\Notifications\Notification;
@@ -27,7 +28,7 @@ class CreateTarea extends CreateRecord
                 ->title('Nueva tarea asignada')
                 ->body("Se te ha asignado la tarea: {$this->record->titulo}")
                 ->actions([
-                    \Filament\Notifications\Actions\Action::make('Ver')
+                    Action::make('Ver')
                         ->url(route('filament.personal.resources.tareas.edit', ['record' => $this->record])),
                 ])                
                 ->sendToDatabase($usuario);

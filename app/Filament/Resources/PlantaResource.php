@@ -2,22 +2,29 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\PlantaResource\Pages\ListPlantas;
+use App\Filament\Resources\PlantaResource\Pages\CreatePlanta;
+use App\Filament\Resources\PlantaResource\Pages\EditPlanta;
 use App\Filament\Resources\PlantaResource\Pages;
 use App\Filament\Resources\PlantaResource\RelationManagers;
 use App\Models\Planta;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
-use Filament\Forms\Get;
-use Filament\Forms\Set;
 use Illuminate\Support\Collection;
 use App\Models\Country;
 use App\Models\Province;
@@ -28,18 +35,18 @@ use Filament\Forms\Components\Tabs\Tab;
 class PlantaResource extends Resource
 {
     protected static ?string $model = Planta::class;
-    protected static ?string $navigationGroup = 'Mantenimiento de clientes';
-    protected static ?string $navigationIcon = 'heroicon-o-building-office'; // ícono tipo "fábrica/planta"
+    protected static string | \UnitEnum | null $navigationGroup = 'Mantenimiento de clientes';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-building-office'; // ícono tipo "fábrica/planta"
     protected static ?string $navigationLabel = 'Plantas';
     protected static ?string $modelLabel = 'Planta';
     protected static ?string $pluralModelLabel = 'Plantas';
 
     protected static bool $shouldRegisterNavigation = false;
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
 {
-    return $form
-        ->schema([
+    return $schema
+        ->components([
             Section::make('Datos de la planta')
             ->icon('heroicon-o-building-office')
                 ->columns(3)
@@ -124,33 +131,33 @@ class PlantaResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('nombre')
+                TextColumn::make('nombre')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('cliente.nombre')
+                TextColumn::make('cliente.nombre')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('contacto')
+                TextColumn::make('contacto')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('direccion')
+                TextColumn::make('direccion')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('telefono1')
+                TextColumn::make('telefono1')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('telefono2')
+                TextColumn::make('telefono2')
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('email')
+                TextColumn::make('email')
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),                
             ])
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -165,9 +172,9 @@ class PlantaResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListPlantas::route('/'),
-            'create' => Pages\CreatePlanta::route('/create'),
-            'edit' => Pages\EditPlanta::route('/{record}/edit'),
+            'index' => ListPlantas::route('/'),
+            'create' => CreatePlanta::route('/create'),
+            'edit' => EditPlanta::route('/{record}/edit'),
         ];
     }
 }

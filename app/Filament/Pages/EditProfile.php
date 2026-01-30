@@ -2,23 +2,22 @@
 
 namespace App\Filament\Pages;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
-use Filament\Pages\Auth\EditProfile as BaseEditProfile;
 
-class EditProfile extends BaseEditProfile
+class EditProfile extends \Filament\Auth\Pages\EditProfile
 {
     protected static string $layout = 'filament-panels::components.layout.index';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 Section::make('Información Personal')
                     ->schema([
                         Grid::make(2)->schema([

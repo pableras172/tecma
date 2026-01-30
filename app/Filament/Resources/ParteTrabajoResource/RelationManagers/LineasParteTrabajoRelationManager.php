@@ -2,8 +2,16 @@
 
 namespace App\Filament\Resources\ParteTrabajoResource\RelationManagers;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Utilities\Set;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Actions\CreateAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Carbon\Carbon;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -18,8 +26,6 @@ use Filament\Forms\Components\{
     Grid,
     Select
 };
-use Filament\Forms\Get;
-use Filament\Forms\Set;
 
 class LineasParteTrabajoRelationManager extends RelationManager
 {
@@ -27,12 +33,12 @@ class LineasParteTrabajoRelationManager extends RelationManager
     protected static ?string $title = 'Registros de parte de trabajo';
     
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
 
-                Grid::make(1)->schema([
+                \Filament\Schemas\Components\Grid::make(1)->schema([
                     DatePicker::make('fecha')
                         ->required()
                         ->default(now()),
@@ -45,7 +51,7 @@ class LineasParteTrabajoRelationManager extends RelationManager
                         ->preload()
                         ->helperText('Selecciona uno o varios usuarios para esta línea de trabajo'),
                 ]),
-                Grid::make(4)->schema([
+                \Filament\Schemas\Components\Grid::make(4)->schema([
                     TimePicker::make('hora_ida')->withoutSeconds()
                         ->label('H. ida')
                         ->reactive()
@@ -64,7 +70,7 @@ class LineasParteTrabajoRelationManager extends RelationManager
                         ->afterStateUpdated(fn ($state, Set $set, Get $get) => $this->calcularHVE($set, $get)),
                 ]),
 
-                Grid::make(4)->schema([
+                \Filament\Schemas\Components\Grid::make(4)->schema([
                     TimePicker::make('hora_inicio_trabajo')->withoutSeconds()
                         ->label('H. inicio t.')
                         ->reactive()
@@ -83,7 +89,7 @@ class LineasParteTrabajoRelationManager extends RelationManager
                         ->afterStateUpdated(fn ($state, Set $set, Get $get) => $this->calcularHT2($set, $get)),
                 ]),
 
-                Grid::make(5)->schema([
+                \Filament\Schemas\Components\Grid::make(5)->schema([
                     TimePicker::make('hora_entrada')
                         ->label('HE')
                         ->default(setting('horarios.hora_entrada', '08:00'))
@@ -115,7 +121,7 @@ class LineasParteTrabajoRelationManager extends RelationManager
                 ]),
               
 
-                Grid::make(4)->schema([
+                \Filament\Schemas\Components\Grid::make(4)->schema([
                     TextInput::make('kms')
                         ->numeric()
                         ->default('0')
@@ -135,35 +141,35 @@ class LineasParteTrabajoRelationManager extends RelationManager
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('fecha')->date('d/m/Y')->sortable(),
-                Tables\Columns\TextColumn::make('usuarios.name')
+                TextColumn::make('fecha')->date('d/m/Y')->sortable(),
+                TextColumn::make('usuarios.name')
                     ->label('Usuarios')
                     ->badge()
                     ->separator(', ')
                     ->limit(3)
                     ->tooltip(fn($record) => $record->usuarios->pluck('name')->join(', ')),
-                Tables\Columns\TextColumn::make('ht1')->label('HT1'),
-                Tables\Columns\TextColumn::make('ht2')->label('HT2'),
-                Tables\Columns\TextColumn::make('hve')->label('HVE'),
-                Tables\Columns\TextColumn::make('kms')->label('Kms'),
-                Tables\Columns\IconColumn::make('media_dieta')->boolean()->label('M/D'),
-                Tables\Columns\IconColumn::make('dieta_completa')->boolean()->label('D/C'),
-                Tables\Columns\IconColumn::make('hotel')->boolean()->label('Hotel'),
+                TextColumn::make('ht1')->label('HT1'),
+                TextColumn::make('ht2')->label('HT2'),
+                TextColumn::make('hve')->label('HVE'),
+                TextColumn::make('kms')->label('Kms'),
+                IconColumn::make('media_dieta')->boolean()->label('M/D'),
+                IconColumn::make('dieta_completa')->boolean()->label('D/C'),
+                IconColumn::make('hotel')->boolean()->label('Hotel'),
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make()
+                CreateAction::make()
                     ->after(function () {
                         $this->getOwnerRecord()->recalcularTotales();
                         $this->dispatch('reloadTotales');
                     }),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make()
+            ->recordActions([
+                EditAction::make()
                     ->after(function () {
                         $this->getOwnerRecord()->recalcularTotales();
                         $this->dispatch('reloadTotales');
                     }),
-                Tables\Actions\DeleteAction::make()
+                DeleteAction::make()
                     ->after(function () {
                         $this->getOwnerRecord()->recalcularTotales();
                         $this->dispatch('reloadTotales');
@@ -240,10 +246,10 @@ class LineasParteTrabajoRelationManager extends RelationManager
         $horasSalida = setting('horarios.hora_salida', '17:00');
 
         // Convertir a objetos Carbon para facilitar los cálculos
-        $inicio = \Carbon\Carbon::createFromFormat('H:i', $horaInicio);
-        $fin = \Carbon\Carbon::createFromFormat('H:i', $horaFin);
-        $entrada = \Carbon\Carbon::createFromFormat('H:i', $horaEntrada);
-        $salida = \Carbon\Carbon::createFromFormat('H:i', $horasSalida);
+        $inicio = Carbon::createFromFormat('H:i', $horaInicio);
+        $fin = Carbon::createFromFormat('H:i', $horaFin);
+        $entrada = Carbon::createFromFormat('H:i', $horaEntrada);
+        $salida = Carbon::createFromFormat('H:i', $horasSalida);
 
         $horasExtra = 0;
 

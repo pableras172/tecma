@@ -2,11 +2,22 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\Toggle;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\TipoTrabajoResource\Pages\ListTipoTrabajos;
+use App\Filament\Resources\TipoTrabajoResource\Pages\CreateTipoTrabajo;
+use App\Filament\Resources\TipoTrabajoResource\Pages\EditTipoTrabajo;
 use App\Filament\Resources\TipoTrabajoResource\Pages;
 use App\Filament\Resources\TipoTrabajoResource\RelationManagers;
 use App\Models\TipoTrabajo;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -17,24 +28,24 @@ class TipoTrabajoResource extends Resource
 {
     protected static ?string $model = TipoTrabajo::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-wrench-screwdriver';
-    protected static ?string $navigationGroup = 'Configuración Tec-Ma';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-wrench-screwdriver';
+    protected static string | \UnitEnum | null $navigationGroup = 'Configuración Tec-Ma';
     protected static ?string $navigationLabel = 'Tipos de trabajo';
     protected static ?string $pluralModelLabel = 'Tipos de trabajo';
     protected static ?string $modelLabel = 'Tipo de trabajo';
 
     protected static bool $shouldRegisterNavigation = false;
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('nombre')
+        return $schema
+            ->components([
+                TextInput::make('nombre')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\Textarea::make('descripcion')
+                Textarea::make('descripcion')
                     ->columnSpanFull(),
-                Forms\Components\Toggle::make('activo')
+                Toggle::make('activo')
                     ->required(),
             ]);
     }
@@ -43,15 +54,15 @@ class TipoTrabajoResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('nombre')
+                TextColumn::make('nombre')
                     ->searchable(),
-                Tables\Columns\IconColumn::make('activo')
+                IconColumn::make('activo')
                     ->boolean(),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -59,13 +70,13 @@ class TipoTrabajoResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                EditAction::make(),
             ])
             
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -80,9 +91,9 @@ class TipoTrabajoResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListTipoTrabajos::route('/'),
-            'create' => Pages\CreateTipoTrabajo::route('/create'),
-            'edit' => Pages\EditTipoTrabajo::route('/{record}/edit'),
+            'index' => ListTipoTrabajos::route('/'),
+            'create' => CreateTipoTrabajo::route('/create'),
+            'edit' => EditTipoTrabajo::route('/{record}/edit'),
         ];
     }
 }

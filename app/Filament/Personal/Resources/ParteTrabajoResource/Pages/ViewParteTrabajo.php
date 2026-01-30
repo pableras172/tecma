@@ -2,6 +2,7 @@
 
 namespace App\Filament\Personal\Resources\ParteTrabajoResource\Pages;
 
+use Filament\Actions\Action;
 use App\Filament\Personal\Resources\ParteTrabajoResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
@@ -16,7 +17,7 @@ class ViewParteTrabajo extends ViewRecord
     {
         return [
             Html2MediaAction::make('print')
-                ->scale(1)
+                //->scale(1)
                 ->label('Imprimir parte')
                 ->icon('heroicon-o-printer')
                 ->print() // Enable print option                
@@ -24,15 +25,15 @@ class ViewParteTrabajo extends ViewRecord
                 ->filename('Parte de trabajo ') // Custom file name
                 ->savePdf() // Enable save as PDF option
                 ->requiresConfirmation() // Show confirmation modal
-                ->pagebreak('section', ['css', 'legacy'])
+                //->pagebreak('section', ['css', 'legacy'])
                 ->orientation('landscape') // Landscape orientation
                 ->format('a4', 'mm') // A4 format with mm units
                 ->enableLinks() // Enable links in PDF
-                ->margin([5, 10, 5, 10]) // Set custom margins
+                //->margin([5, 10, 5, 10]) // Set custom margins
                 ->content(fn($record) => view('filament.resources.parte.parte', ['parte' => $record])),
             
 
-            Actions\Action::make('volver')
+            Action::make('volver')
                 ->label('Volver al listado')
                 ->url(route('filament.personal.resources.parte-trabajos.index'))
                 ->color('gray')

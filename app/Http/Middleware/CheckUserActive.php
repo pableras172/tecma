@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use Log;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -11,20 +12,20 @@ class CheckUserActive
     /**
      * Handle an incoming request.
      *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * @param Closure(Request):Response $next
      */
     public function handle(Request $request, Closure $next): Response
     {
         $user = $request->user();
         
         if($user) {
-            \Log::info('User logged in', [           
+            Log::info('User logged in', [           
                 'user_id' =>  $user->id,
                 'user_email' =>  $user->email,
             ]);
 
         }else{
-            \Log::info('No user logged in');
+            Log::info('No user logged in');
         }
         // Si hay un usuario autenticado pero no está activo
         if ($user && !$user->active) {

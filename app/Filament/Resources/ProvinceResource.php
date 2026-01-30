@@ -2,11 +2,20 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\ProvinceResource\Pages\ListProvinces;
+use App\Filament\Resources\ProvinceResource\Pages\CreateProvince;
+use App\Filament\Resources\ProvinceResource\Pages\EditProvince;
 use App\Filament\Resources\ProvinceResource\Pages;
 use App\Filament\Resources\ProvinceResource\RelationManagers;
 use App\Models\Province;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -17,22 +26,22 @@ class ProvinceResource extends Resource
 {
     protected static ?string $model = Province::class;
 
-    protected static ?string $navigationGroup = 'Ubicación';
-    protected static ?string $navigationIcon = 'heroicon-o-flag';
+    protected static string | \UnitEnum | null $navigationGroup = 'Ubicación';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-flag';
     protected static ?string $navigationLabel = 'Provincias';
     protected static ?string $modelLabel = 'Provincias';
     protected static ?string $pluralModelLabel = 'Provincias';
     protected static bool $shouldRegisterNavigation = false;
 
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Select::make('country_id')
+        return $schema
+            ->components([
+                Select::make('country_id')
                     ->relationship('country', 'name')
                     ->required(),
-                Forms\Components\TextInput::make('name')
+                TextInput::make('name')
                     ->required()
                     ->maxLength(255),
             ]);
@@ -42,16 +51,16 @@ class ProvinceResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('country.name')
+                TextColumn::make('country.name')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('name')
+                TextColumn::make('name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -59,12 +68,12 @@ class ProvinceResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -79,9 +88,9 @@ class ProvinceResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListProvinces::route('/'),
-            'create' => Pages\CreateProvince::route('/create'),
-            'edit' => Pages\EditProvince::route('/{record}/edit'),
+            'index' => ListProvinces::route('/'),
+            'create' => CreateProvince::route('/create'),
+            'edit' => EditProvince::route('/{record}/edit'),
         ];
     }
 }

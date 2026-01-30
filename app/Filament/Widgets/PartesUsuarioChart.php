@@ -8,7 +8,7 @@ use App\Models\User;
 
 class PartesUsuarioChart extends ChartWidget
 {
-    protected static ?string $heading = 'Partes de trabajo por usuario';
+    protected ?string $heading = 'Partes de trabajo por usuario';
 
     protected static array $columns = [
         'default' => 1,

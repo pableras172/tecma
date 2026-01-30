@@ -1,10 +1,12 @@
 <?php
 namespace App\Filament\Resources\DepartamentoResource\RelationManagers;
 
+use Filament\Tables\Table;
+use Filament\Actions\Action;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Tables;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Actions\Action;
 
 class UsuariosRelationManager extends RelationManager
 {
@@ -12,7 +14,7 @@ class UsuariosRelationManager extends RelationManager
 
     protected static ?string $title = '🏢 Empleados del departamento';
 
-    public function table(Tables\Table $table): Tables\Table
+    public function table(Table $table): Table
     {
         return $table
             ->recordUrl(fn ($record) => route('filament.dashboard.resources.users.edit', ['record' => $record]))
@@ -31,15 +33,15 @@ class UsuariosRelationManager extends RelationManager
                     ]))
                     ,
             ])
-            ->actions([
+            ->recordActions([
                 Action::make('editar')
                     ->label('Editar')
                     ->icon('heroicon-o-pencil-square')
                     ->url(fn ($record) => route('filament.dashboard.resources.users.edit', ['record' => $record]))
                     ,
             ])
-            ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                DeleteBulkAction::make(),
             ]);
     }
 }
