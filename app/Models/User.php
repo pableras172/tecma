@@ -126,4 +126,12 @@ class User extends Authenticatable implements FilamentUser, HasAvatar,Auditable
         return $this->belongsToMany(LineaParteTrabajo::class, 'linea_parte_trabajo_user');
     }
 
+    /**
+     * Partes de trabajo de los cuales este usuario es responsable
+     */
+    public function partesResponsable()
+    {
+        return $this->hasMany(ParteTrabajo::class, 'user_responsable_id');
+    }
+
 }

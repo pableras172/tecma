@@ -53,6 +53,7 @@ class PersonalPanelProvider extends PanelProvider
             ->widgets([
                 \App\Filament\Personal\Widgets\PersonalTareasUsuarioWidget::class,
                 \App\Filament\Personal\Widgets\TareasUsuarioChart::class,
+                \App\Filament\Personal\Widgets\PartesEstadoChart::class,
             ])
             ->middleware([
                 EncryptCookies::class,

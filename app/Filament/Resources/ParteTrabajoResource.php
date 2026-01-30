@@ -45,7 +45,11 @@ class ParteTrabajoResource extends Resource
                                             ->schema([
                                                 Forms\Components\TextInput::make('numero')
                                                     ->required()
-                                                    ->maxLength(255),
+                                                    ->maxLength(255)
+                                                    ->unique(ignoreRecord: true)
+                                                    ->validationMessages([
+                                                        'unique' => 'Este número de parte ya existe.',
+                                                    ]),
                                                 Forms\Components\DatePicker::make('fecha_parte')
                                                     ->required(),
                                                 // El resto sigue igual
@@ -322,8 +326,12 @@ class ParteTrabajoResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('numero')
-                    ->searchable(),
+                    ->label('Número')
+                    ->searchable()
+                    ->sortable(),
+
                 Tables\Columns\TextColumn::make('fecha_parte')
+                    ->label('Fecha')
                     ->date('d/m/Y')
                     ->sortable()
                     ->searchable(),

@@ -1,9 +1,11 @@
 <?php
 
-namespace App\Filament\Personal\Resources;
+namespace App\Filament\Resources;
 
-use App\Filament\Personal\Resources\ParteTrabajoResource\Pages;
-use App\Filament\Personal\Resources\ParteTrabajoResource\RelationManagers;
+
+use App\Filament\Resources\ParteTrabajoResource\Pages;
+use App\Filament\Resources\ParteTrabajoResource\RelationManagers;
+use App\Filament\Resources\ParteTrabajoResource\RelationManagers\DocRelationManager;
 use App\Models\ParteTrabajo;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -12,32 +14,17 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\Personal\Resources\ParteTrabajoResource\RelationManagers\LineasParteTrabajoRelationManager;
-use App\Filament\Personal\Resources\ParteTrabajoResource\RelationManagers\DocRelationManager;
+use App\Filament\Resources\ParteTrabajoResource\RelationManagers\LineasParteTrabajoRelationManager;
 use Saade\FilamentAutograph\Forms\Components\SignaturePad;
 use Filament\Forms\Actions\Action;
 use Filament\Forms\Components\Tabs;
+
 
 class ParteTrabajoResource extends Resource
 {
     protected static ?string $model = ParteTrabajo::class;
     protected static ?string $navigationGroup = 'Gestión de tareas';
     protected static ?string $navigationIcon = 'heroicon-o-briefcase';
-
-    protected static ?string $navigationLabel = 'Mis Partes de Trabajo';
-
-    protected static ?string $modelLabel = 'Parte de Trabajo';
-
-    protected static ?string $pluralModelLabel = 'Partes de Trabajo';
-
-    /**
-     * Filtrar solo los partes del usuario logueado
-     */
-    public static function getEloquentQuery(): Builder
-    {
-        return parent::getEloquentQuery()
-            ->where('user_responsable_id', auth()->id());
-    }
 
     public static function form(Form $form): Form
     {
@@ -58,11 +45,7 @@ class ParteTrabajoResource extends Resource
                                             ->schema([
                                                 Forms\Components\TextInput::make('numero')
                                                     ->required()
-                                                    ->maxLength(255)
-                                                    ->unique(ignoreRecord: true)
-                                                    ->validationMessages([
-                                                        'unique' => 'Este número de parte ya existe.',
-                                                    ]),
+                                                    ->maxLength(255),
                                                 Forms\Components\DatePicker::make('fecha_parte')
                                                     ->required(),
                                                 // El resto sigue igual
@@ -140,9 +123,7 @@ class ParteTrabajoResource extends Resource
                                                 Forms\Components\Select::make('user_responsable_id')
                                                     ->label('Responsable')
                                                     ->options(\App\Models\User::pluck('name', 'id')->toArray())
-                                                    ->default(auth()->id())
-                                                    ->disabled()
-                                                    ->dehydrated()
+                                                    ->searchable()
                                                     ->required(),
                                                 Forms\Components\Textarea::make('trabajo_realizado')
                                                     ->columnSpanFull(),
@@ -341,34 +322,35 @@ class ParteTrabajoResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('numero')
-                    ->label('Número')
-                    ->searchable()
-                    ->sortable(),
-
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('fecha_parte')
-                    ->label('Fecha')
                     ->date('d/m/Y')
                     ->sortable()
                     ->searchable(),
-
                 Tables\Columns\TextColumn::make('cliente.nombre')
                     ->label('Cliente')
                     ->sortable()
                     ->searchable(),
-
                 Tables\Columns\TextColumn::make('planta.nombre')
                     ->label('Planta')
-                    ->sortable()
-                    ->searchable(),
-
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('tipoTrabajo.nombre')
                     ->label('Tipo de Trabajo')
                     ->sortable()
                     ->searchable(),
-
+                Tables\Columns\TextColumn::make('creador.name')
+                    ->label('Responsable')
+                    ->sortable()
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('estado'),
                 Tables\Columns\TextColumn::make('estado')
                     ->label('Estado')
-                    ->badge()
+                    ->icon(fn(string $state): ?string => match ($state) {
+                        'borrador' => 'heroicon-o-pencil',
+                        'cerrado' => 'heroicon-o-lock-closed',
+                        'facturado' => 'heroicon-o-currency-euro',
+                        default => null,
+                    })
                     ->color(fn(string $state): string => match ($state) {
                         'borrador' => 'gray',
                         'cerrado' => 'warning',
@@ -383,10 +365,6 @@ class ParteTrabajoResource extends Resource
                     })
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('total_horas_trabajo')
-                    ->label('H. Trabajo')
-                    ->numeric(2)
-                    ->sortable(),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('cliente_id')
@@ -406,38 +384,19 @@ class ParteTrabajoResource extends Resource
                         'cerrado' => 'Cerrado',
                         'facturado' => 'Facturado',
                     ]),
-
-                Tables\Filters\Filter::make('fecha_parte')
-                    ->form([
-                        Forms\Components\DatePicker::make('desde')
-                            ->label('Desde'),
-                        Forms\Components\DatePicker::make('hasta')
-                            ->label('Hasta'),
-                    ])
-                    ->query(function (Builder $query, array $data): Builder {
-                        return $query
-                            ->when(
-                                $data['desde'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('fecha_parte', '>=', $date),
-                            )
-                            ->when(
-                                $data['hasta'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('fecha_parte', '<=', $date),
-                            );
-                    }),
             ])
             ->searchPlaceholder('Buscar:')
             ->actions([
-                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make()
-                    ->visible(fn ($record) => $record->user_responsable_id === auth()->id()),
-                Tables\Actions\DeleteAction::make()
-                    ->visible(fn ($record) => $record->user_responsable_id === auth()->id()),
+                    ->label('Editar'),
+
             ])
             ->bulkActions([
-                // Sin acciones masivas para usuarios normales
-            ])
-            ->defaultSort('fecha_parte', 'desc');
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->label('Eliminar seleccionados'),
+                ]),
+            ]);
     }
 
     public static function getRelations(): array
@@ -449,37 +408,13 @@ class ParteTrabajoResource extends Resource
     }
 
 
+
     public static function getPages(): array
     {
         return [
             'index' => Pages\ListParteTrabajos::route('/'),
             'create' => Pages\CreateParteTrabajo::route('/create'),
             'edit' => Pages\EditParteTrabajo::route('/{record}/edit'),
-            'view' => Pages\ViewParteTrabajo::route('/{record}'),
         ];
-    }
-
-    /**
-     * Deshabilitar creación para usuarios normales
-     */
-    public static function canCreate(): bool
-    {
-        return true;
-    }
-
-    /**
-     * Permitir edición solo si el usuario es el responsable
-     */
-    public static function canEdit($record): bool
-    {
-        return $record->user_responsable_id === auth()->id();
-    }
-
-    /**
-     * Permitir eliminación solo si el usuario es el responsable
-     */
-    public static function canDelete($record): bool
-    {
-        return $record->user_responsable_id === auth()->id();
     }
 }

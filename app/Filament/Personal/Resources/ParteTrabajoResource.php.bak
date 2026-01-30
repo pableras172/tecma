@@ -15,7 +15,6 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Personal\Resources\ParteTrabajoResource\RelationManagers\LineasParteTrabajoRelationManager;
 use App\Filament\Personal\Resources\ParteTrabajoResource\RelationManagers\DocRelationManager;
 use Saade\FilamentAutograph\Forms\Components\SignaturePad;
-use Filament\Forms\Actions\Action;
 use Filament\Forms\Components\Tabs;
 
 class ParteTrabajoResource extends Resource
@@ -58,11 +57,7 @@ class ParteTrabajoResource extends Resource
                                             ->schema([
                                                 Forms\Components\TextInput::make('numero')
                                                     ->required()
-                                                    ->maxLength(255)
-                                                    ->unique(ignoreRecord: true)
-                                                    ->validationMessages([
-                                                        'unique' => 'Este número de parte ya existe.',
-                                                    ]),
+                                                    ->maxLength(255),
                                                 Forms\Components\DatePicker::make('fecha_parte')
                                                     ->required(),
                                                 // El resto sigue igual
@@ -140,9 +135,7 @@ class ParteTrabajoResource extends Resource
                                                 Forms\Components\Select::make('user_responsable_id')
                                                     ->label('Responsable')
                                                     ->options(\App\Models\User::pluck('name', 'id')->toArray())
-                                                    ->default(auth()->id())
-                                                    ->disabled()
-                                                    ->dehydrated()
+                                                    ->searchable()
                                                     ->required(),
                                                 Forms\Components\Textarea::make('trabajo_realizado')
                                                     ->columnSpanFull(),
@@ -389,16 +382,6 @@ class ParteTrabajoResource extends Resource
                     ->sortable(),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('cliente_id')
-                    ->label('Cliente')
-                    ->relationship('cliente', 'nombre')
-                    ->searchable()
-                    ->preload(),
-                Tables\Filters\SelectFilter::make('user_responsable_id')
-                    ->label('Responsable')
-                    ->relationship('creador', 'name')
-                    ->searchable()
-                    ->preload(),
                 Tables\Filters\SelectFilter::make('estado')
                     ->label('Estado')
                     ->options([
@@ -426,7 +409,6 @@ class ParteTrabajoResource extends Resource
                             );
                     }),
             ])
-            ->searchPlaceholder('Buscar:')
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make()

@@ -71,6 +71,7 @@ class DashboardPanelProvider extends PanelProvider
             ->widgets([
                 \App\Filament\Personal\Widgets\PersonalTareasUsuarioWidget::class,
                 TareasPorUsuarioChart::class,
+                \App\Filament\Widgets\PartesUsuarioChart::class,
             ])
             ->middleware([
                 EncryptCookies::class,
