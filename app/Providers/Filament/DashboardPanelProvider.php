@@ -66,8 +66,8 @@ class DashboardPanelProvider extends PanelProvider
             ])
             ->plugin(
                 FilamentSettingsHubPlugin::make()
-                    ->allowSiteSettings()
-                    ->allowSocialMenuSettings(),
+                    ->allowSiteSettings(),
+                    //->allowSocialMenuSettings(),
                 FilamentBackgroundsPlugin::make()
                     ->imageProvider(MyImages::make()
                         ->directory('images/backgrounds')),

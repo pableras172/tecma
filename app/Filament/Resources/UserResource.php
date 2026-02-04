@@ -118,7 +118,7 @@ class UserResource extends Resource
                                 }
 
                                 $component->state(
-                                    $record->roles->pluck('id')->toArray()
+                                    $record->roles->first()?->id
                                 );
                             })
                             ->saveRelationshipsUsing(function ($record, $state) {

@@ -99,14 +99,7 @@ class User extends Authenticatable implements FilamentUser, HasAvatar,Auditable
         if (!$this->active) {
             return false;
         }
-
-        //Mostrar en el log el id del panel
-        Log::info('Panel Access Attempt', [
-            'panel_id' => $panel->getId(),
-            'user_id' => $this->id,
-            'user_email' => $this->email,
-        ]);
-        
+      
         return match ($panel->getId()) {
             'dashboard' => $this->hasRole('admin'),
             'personal'  => $this->hasRole('empleado') || $this->hasRole('admin'),

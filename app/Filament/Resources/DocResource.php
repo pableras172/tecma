@@ -6,6 +6,7 @@ use Filament\Schemas\Schema;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\FileUpload;
 use Filament\Schemas\Components\Utilities\Set;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Columns\TextColumn;
@@ -48,30 +49,38 @@ class DocResource extends Resource
                 FileUpload::make('ruta')
                     ->label('Subir Documento')
                     ->acceptedFileTypes(['application/pdf'])
-                    ->directory(fn () => 'documentos/' . date('Y'))
+                    ->directory(function () {
+                        $parte = $this->getOwnerRecord();
+                        
+                        $nombreCliente = \Str::slug($parte->cliente?->nombre ?? 'sin-cliente');
+                        $anio = date('Y');
+                        $numeroParte = $parte->numero;
+                        
+                        return "documentos/{$nombreCliente}/{$anio}/{$numeroParte}";
+                    })
                     ->disk('public')
                     ->maxSize(10240)
-                    ->required()                                      
+                    ->required()
                     ->preserveFilenames()
                     ->afterStateUpdated(function ($state, Set $set) {
                         if ($state) {
-                            // Si es un objeto TemporaryUploadedFile
+                            // Obtener nombre del archivo
+                            $nombreArchivo = '';
+                            
                             if (is_object($state)) {
                                 $nombreArchivo = pathinfo($state->getClientOriginalName(), PATHINFO_FILENAME);
                             } else {
-                                // Si es una string (ruta)
                                 $nombreArchivo = pathinfo($state, PATHINFO_FILENAME);
                             }
                             
                             // Autocompletar nombre del documento
-                            $set('nombre_documento', $nombreArchivo);
+                            $set('nombre_documento', 'informe_'.$nombreArchivo);
                             
                             // Autocompletar fecha con la fecha actual
                             $set('fecha', date('Y-m-d'));
                         }
                     })
-                    ->columnSpanFull()
-                    ,
+                    ->columnSpanFull(),
 
                 TextInput::make('nombre_documento')
                     ->label('Nombre del Documento')

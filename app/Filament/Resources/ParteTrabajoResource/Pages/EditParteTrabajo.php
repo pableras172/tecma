@@ -5,9 +5,8 @@ namespace App\Filament\Resources\ParteTrabajoResource\Pages;
 use Filament\Actions\DeleteAction;
 use App\Filament\Resources\ParteTrabajoResource;
 use Filament\Actions;
+use Filament\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
-use Torgodly\Html2Media\Actions\Html2MediaAction;
-
 
 class EditParteTrabajo extends EditRecord
 {
@@ -27,23 +26,60 @@ class EditParteTrabajo extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            //añade un boton de ver el parte. Abrira la vista personalizada del parte
+            Actions\Action::make('volver')
+                ->label('Volver al listado')
+                ->icon('heroicon-o-arrow-left')
+                ->color('gray')
+                ->url(fn () => ParteTrabajoResource::getUrl('index')),
 
-            Html2MediaAction::make('print')
-                ->scale(1)
-                ->label('Imprimir parte')
-                ->icon('heroicon-o-printer')
-                ->print() // Enable print option                
-                ->preview() // Enable preview option
-                ->filename('Parte de trabajo ') // Custom file name
-                ->savePdf() // Enable save as PDF option
-                ->requiresConfirmation() // Show confirmation modal
-                ->pagebreak('section', ['css', 'legacy'])
-                ->orientation('landscape') // Landscape orientation
-                ->format('a4', 'mm') // A4 format with mm units
-                ->enableLinks() // Enable links in PDF
-                ->margin([5, 10, 5, 10]) // Set custom margins
-                ->content(fn($record) => view('filament.resources.parte.parte', ['parte' => $record])),
+            Actions\Action::make('guardar_pdf')
+                ->label('Guardar PDF')
+                ->icon('heroicon-o-document-arrow-down')
+                ->color('success')
+                ->action(function () {
+                    // Genera el HTML
+                    $html = view('filament.resources.parte.parte', ['parte' => $this->record])->render();
+                    
+                    // Genera el PDF usando DomPDF
+                    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadHTML($html)
+                        ->setPaper('a4', 'landscape');
+                    
+                    // Define la ruta siguiendo la estructura: documentos/{nombrecliente}/{año}/{numeroparte}/parte_{numero}.pdf
+                    $nombreCliente = \Str::slug($this->record->cliente?->nombre ?? 'sin-cliente');
+                    $anio = date('Y');
+                    $numeroParte = $this->record->numero;
+                    $filename = "parte_{$numeroParte}.pdf";
+                    $path = "documentos/{$nombreCliente}/{$anio}/{$numeroParte}/{$filename}";
+                    
+                    // Guarda en storage
+                    \Storage::disk('public')->put($path, $pdf->output());
+                    
+                    // Crea un registro en la tabla docs
+                    $doc = \App\Models\Doc::create([
+                        'parte_trabajo_id' => $this->record->id,
+                        'ruta' => $path,
+                        'nombre_documento' => "Parte de trabajo {$numeroParte}",
+                        'fecha' => now(),
+                    ]);
+                    
+                    // Notificación con acción para ver el PDF
+                    \Filament\Notifications\Notification::make()
+                        ->title('PDF generado correctamente')
+                        ->success()
+                        ->body("El parte se ha guardado como documento")
+                        ->actions([
+                            Action::make('ver')
+                                ->label('Ver PDF')
+                                ->icon('heroicon-o-eye')
+                                ->url(asset('storage/' . $path))
+                                ->openUrlInNewTab(),
+                        ])
+                        ->send();
+                    
+                    // Recargar la tabla de documentos
+                    $this->dispatch('refresh-docs');
+                }),
+            
             DeleteAction::make()->icon('heroicon-o-trash')
                 ->label('Eliminar parte de trabajo'),
 

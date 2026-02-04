@@ -263,7 +263,6 @@ class ParteTrabajoResource extends Resource
                                                 ->penColorOnDark('#000')
                                                 ->clearable(true)
                                                 ->undoable(false)
-                                                ->confirmable()
                                                 ->doneAction(fn($action) => $action->iconButton()->icon('heroicon-o-check')->color('success'))
                                                 ->formatStateUsing(function ($state, $record) {
                                                     if (!$state || !$record) {
@@ -314,7 +313,6 @@ class ParteTrabajoResource extends Resource
                                                 ->penColorOnDark('#000')
                                                 ->clearable(true)
                                                 ->undoable(false)
-                                                ->confirmable()
                                                 ->doneAction(fn($action) => $action->iconButton()->icon('heroicon-o-check')->color('success'))
                                                 ->formatStateUsing(function ($state, $record) {
                                                     if (!$state || !$record) {

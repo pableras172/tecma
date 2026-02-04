@@ -92,12 +92,12 @@ class LineasParteTrabajoRelationManager extends RelationManager
                 \Filament\Schemas\Components\Grid::make(5)->schema([
                     TimePicker::make('hora_entrada')
                         ->label('HE')
-                        ->default(setting('horarios.hora_entrada', '08:00'))
+                        ->default(config('app.hora_entada', '08:00'))
                         ->disabled()
                         ->dehydrated(),
                     TimePicker::make('hora_salida')
                         ->label('HS')
-                        ->default(setting('horarios.hora_salida', '17:00'))
+                        ->default(config('app.hora_salida', '17:00'))
                         ->disabled()
                         ->dehydrated(),
                     TextInput::make('ht1')
