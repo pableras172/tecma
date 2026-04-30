@@ -77,7 +77,7 @@ class UserResource extends Resource
 
                         TextInput::make('password')
                             ->password()
-                            ->hiddenOn('edit')
+                            //->hiddenOn('edit')
                             ->required(),
 
                         TextInput::make('dni')

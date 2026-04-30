@@ -38,6 +38,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\ParteTrabajoResource\RelationManagers\LineasParteTrabajoRelationManager;
 use Saade\FilamentAutograph\Forms\Components\SignaturePad;
 use Filament\Forms\Actions\Action;
+use App\Models\SecuenciaParte;
 
 
 class ParteTrabajoResource extends Resource
@@ -63,12 +64,53 @@ class ParteTrabajoResource extends Resource
                                     Group::make([
                                         Section::make('Parte de trabajo')
                                             ->schema([
-                                                TextInput::make('numero')
-                                                    ->required()
-                                                    ->maxLength(255)
-                                                    ->unique(ignoreRecord: true)
-                                                    ->validationMessages([
-                                                        'unique' => 'Este número de parte ya existe.',
+                                                Grid::make(3)
+                                                    ->schema([
+                                                        Select::make('codigo')
+                                                            ->label('Código')
+                                                            ->options([
+                                                                'TEC' => 'TEC',
+                                                                '2G' => '2G',
+                                                            ])
+                                                            ->required()
+                                                            ->reactive()
+                                                            ->disabled(fn ($record) => $record !== null)
+                                                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                                                $anio = $get('anio');
+                                                                if ($state && $anio) {
+                                                                    $siguienteSecuencia = SecuenciaParte::obtenerSiguiente($state, $anio);
+                                                                    $numero = SecuenciaParte::generarNumero($state, $anio, $siguienteSecuencia);
+                                                                    $set('numero', $numero);
+                                                                }
+                                                            }),
+                                                        Select::make('anio')
+                                                            ->label('Año')
+                                                            ->options(function () {
+                                                                $currentYear = date('Y');
+                                                                return [
+                                                                    ($currentYear - 1) => ($currentYear - 1),
+                                                                    $currentYear => $currentYear,
+                                                                    ($currentYear + 1) => ($currentYear + 1),
+                                                                ];
+                                                            })
+                                                            ->default(date('Y'))
+                                                            ->required()
+                                                            ->reactive()
+                                                            ->disabled(fn ($record) => $record !== null)
+                                                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                                                $codigo = $get('codigo');
+                                                                if ($codigo && $state) {
+                                                                    $siguienteSecuencia = SecuenciaParte::obtenerSiguiente($codigo, $state);
+                                                                    $numero = SecuenciaParte::generarNumero($codigo, $state, $siguienteSecuencia);
+                                                                    $set('numero', $numero);
+                                                                }
+                                                            }),
+                                                        TextInput::make('numero')
+                                                            ->label('Número')
+                                                            ->required()
+                                                            ->disabled()
+                                                            ->dehydrated()
+                                                            ->placeholder('Seleccione código y año'),
                                                     ]),
                                                 DatePicker::make('fecha_parte')
                                                     ->required(),
