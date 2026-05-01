@@ -287,10 +287,11 @@ class ParteTrabajoResource extends Resource
                             ->icon('heroicon-o-pencil-square')
                             ->schema([
                                 Section::make('Firmas')
+                                    ->description('Firme con el dedo, ratón o stylus en el recuadro blanco')
                                     ->schema([
                                         Grid::make([
                                             'default' => 1,
-                                            'md' => 2,
+                                            'lg' => 2,
                                         ])->schema([
                                             SignaturePad::make('firma_tecnico')
                                                 ->label(__('Firma del técnico'))

@@ -9,3 +9,40 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
+
+/* Mejoras para SignaturePad - Firmas */
+@layer components {
+    /* Canvas del SignaturePad con altura adaptativa */
+    [x-data*="signaturePadFormComponent"] canvas {
+        min-height: 200px !important;
+        max-height: 300px !important;
+        height: 250px !important;
+        width: 100% !important;
+        display: block;
+    }
+
+    /* En móviles, canvas más pequeño pero usable */
+    @media (max-width: 640px) {
+        [x-data*="signaturePadFormComponent"] canvas {
+            min-height: 180px !important;
+            height: 200px !important;
+            max-height: 250px !important;
+        }
+    }
+
+    /* En tablets, altura media */
+    @media (min-width: 641px) and (max-width: 1024px) {
+        [x-data*="signaturePadFormComponent"] canvas {
+            min-height: 220px !important;
+            height: 240px !important;
+            max-height: 280px !important;
+        }
+    }
+
+    /* Asegurar que el contenedor del SignaturePad no se desborde */
+    [x-data*="signaturePadFormComponent"] {
+        width: 100%;
+        max-width: 100%;
+        overflow: hidden;
+    }
+}
