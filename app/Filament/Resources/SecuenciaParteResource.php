@@ -35,6 +35,7 @@ class SecuenciaParteResource extends Resource
     protected static ?string $pluralModelLabel = 'Secuencias de Partes';
     
     protected static ?int $navigationSort = 10;
+    protected static bool $shouldRegisterNavigation = false;
 
     public static function form(Schema $schema): Schema
     {

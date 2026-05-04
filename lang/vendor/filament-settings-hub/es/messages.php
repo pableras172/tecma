@@ -5,6 +5,7 @@ return [
     'group' => 'Configuración',
     'back' => 'Volver',
     'settings' => [
+        'group' => 'General',
         'site' => [
             'title' => 'Configuración del Sitio',
             'description' => 'Administrar la configuración de tu sitio',
