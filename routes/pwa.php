@@ -3,8 +3,16 @@
 use Illuminate\Support\Facades\Route;
 
 Route::get('/manifest.json', function () {
+    // Obtener el nombre del sitio de forma segura
+    $siteName = 'TECMA - Sistema de Gestión';
+    try {
+        $siteName = setting('site_name', $siteName);
+    } catch (\Exception $e) {
+        // Si falla la conexión a BD, usar valor por defecto
+    }
+
     return response()->json([
-        'name' => setting('site_name', 'TECMA - Sistema de Gestión'),
+        'name' => $siteName,
         'short_name' => 'TECMA',
         'description' => 'Sistema de gestión de partes de trabajo',
         'start_url' => url('/dashboard'),
