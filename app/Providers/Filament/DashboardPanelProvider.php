@@ -55,7 +55,7 @@ class DashboardPanelProvider extends PanelProvider
                 'warning' => Color::Orange,
             ])
             ->font('Poppins')
-            ->brandName(setting("site_name"))
+            ->brandName(fn() => setting("site_name", 'TECMA'))
             ->brandLogo(fn() => setting("site_logo") ? asset('storage/' . setting("site_logo")) : null)
             ->brandLogoHeight('3rem')
             ->favicon(fn() => setting("site_profile") ? asset('storage/' . setting("site_profile")) : null)
