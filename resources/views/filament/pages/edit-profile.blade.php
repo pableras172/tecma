@@ -1,9 +1,7 @@
-<x-filament-panels::page>
-    <form wire:submit="save">
-        {{ $this->form }}
+@php
+    $pageComponent = static::isSimple() ? 'filament-panels::page.simple' : 'filament-panels::page';
+@endphp
 
-        <x-filament-panels::form.actions
-            :actions="$this->getFormActions()"
-        />
-    </form>
-</x-filament-panels::page>
+<x-dynamic-component :component="$pageComponent">
+    {{ $this->content }}
+</x-dynamic-component>
