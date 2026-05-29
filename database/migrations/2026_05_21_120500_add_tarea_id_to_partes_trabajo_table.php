@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('partes_trabajo', function (Blueprint $table) {
+        Schema::table('parte_trabajo', function (Blueprint $table) {
             $table->foreignId('tarea_id')
                 ->nullable()
                 ->after('anio')
@@ -26,7 +26,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('partes_trabajo', function (Blueprint $table) {
+        Schema::table('parte_trabajo', function (Blueprint $table) {
             $table->dropForeign(['tarea_id']);
             $table->dropUnique(['tarea_id']);
             $table->dropColumn('tarea_id');
