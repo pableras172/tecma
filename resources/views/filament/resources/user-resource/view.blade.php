@@ -1,5 +1,5 @@
 <x-filament::section>
-    <x-filament::grid :columns="2">
+    <div class="grid gap-6 md:grid-cols-2">
         <div class="mt-4">
             <x-filament::section.heading>Foto de perfil</x-filament::section.heading>
             @if ($record->foto)
@@ -25,5 +25,5 @@
             <p><strong>Ciudad:</strong> {{ $record->city->name ?? '-' }}</p>
             <p><strong>Dirección:</strong> {{ $record->direccion }}</p>
         </div>
-    </x-filament::grid>
+    </div>
 </x-filament::section>
