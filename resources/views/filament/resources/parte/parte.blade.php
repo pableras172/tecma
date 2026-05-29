@@ -4,6 +4,12 @@
     $tipoTrabajo = $parte->tipoTrabajo;
     $responsable = $parte->creador;
     $lineas = $parte->lineas;
+    $resumenPorCategoria = $parte->obtenerResumenPorCategoria();
+    $totalHorasViajeResumen = round($resumenPorCategoria->sum('horas_viaje'), 2);
+    $totalHorasTrabajoResumen = round($resumenPorCategoria->sum('horas_trabajo'), 2);
+    $totalHt1Resumen = round($resumenPorCategoria->sum('ht1'), 2);
+    $totalHt2Resumen = round($resumenPorCategoria->sum('ht2'), 2);
+    $totalHveResumen = round($resumenPorCategoria->sum('hve'), 2);
 @endphp
 
 <style>
@@ -211,11 +217,43 @@
 <table class="table">
     <thead>
         <tr>
+            <th>Categoría</th>
             <th>H. viaje</th>
             <th>H. trabajo</th>
             <th>HT1</th>
             <th>HT2</th>
             <th>HVE</th>
+        </tr>
+    </thead>
+    <tbody>
+        @forelse($resumenPorCategoria as $resumen)
+            <tr>
+                <td>{{ $resumen['categoria'] }}</td>
+                <td>{{ $resumen['horas_viaje'] }}</td>
+                <td>{{ $resumen['horas_trabajo'] }}</td>
+                <td>{{ $resumen['ht1'] }}</td>
+                <td>{{ $resumen['ht2'] }}</td>
+                <td>{{ $resumen['hve'] }}</td>
+            </tr>
+        @empty
+            <tr>
+                <td colspan="6">Sin líneas de resumen por categoría.</td>
+            </tr>
+        @endforelse
+        <tr>
+            <td><strong>Total</strong></td>
+            <td><strong>{{ $totalHorasViajeResumen }}</strong></td>
+            <td><strong>{{ $totalHorasTrabajoResumen }}</strong></td>
+            <td><strong>{{ $totalHt1Resumen }}</strong></td>
+            <td><strong>{{ $totalHt2Resumen }}</strong></td>
+            <td><strong>{{ $totalHveResumen }}</strong></td>
+        </tr>
+    </tbody>
+</table>
+
+<table class="table">
+    <thead>
+        <tr>
             <th>Kms</th>
             <th>M/D</th>
             <th>D/C</th>
@@ -224,11 +262,6 @@
     </thead>
     <tbody>
         <tr>
-            <td>{{ $parte->total_horas_viaje }}</td>
-            <td>{{ $parte->total_horas_trabajo }}</td>
-            <td>{{ $parte->total_ht1 }}</td>
-            <td>{{ $parte->total_ht2 }}</td>
-            <td>{{ $parte->total_hve }}</td>
             <td>{{ $parte->total_km }}</td>
             <td>{{ $parte->total_media_dieta }}</td>
             <td>{{ $parte->total_dieta }}</td>

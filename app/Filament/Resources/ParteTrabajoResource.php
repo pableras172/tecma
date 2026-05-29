@@ -12,6 +12,7 @@ use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\ViewField;
 use App\Models\Planta;
 use App\Models\TipoTrabajo;
 use Filament\Forms\Components\Textarea;
@@ -201,68 +202,12 @@ class ParteTrabajoResource extends Resource
                         Tab::make('Resumen')
                             ->icon('heroicon-o-calculator')
                             ->schema([
-                                Section::make('Resumen del trabajo')
-                                    ->description('Estos valores se calculan automáticamente desde las líneas de trabajo')
+                                Section::make('Resumen por categoría de técnico')
+                                    ->description('Horas agrupadas por categoría profesional de los técnicos asignados a cada línea')
                                     ->schema([
-                                        Grid::make([
-                                            'default' => 4,
-                                            'md' => 10,
-                                        ])->schema([
-                                            TextInput::make('total_horas_viaje')
-                                                ->label('H.V.')
-                                                ->numeric()
-                                                ->default(0.00)
-                                                ->disabled()
-                                                ->dehydrated(),
-                                            TextInput::make('total_horas_trabajo')
-                                                ->label('H.T.')
-                                                ->numeric()
-                                                ->default(0.00)
-                                                ->disabled()
-                                                ->dehydrated(),
-                                            TextInput::make('total_ht1')
-                                                ->label('HT1')
-                                                ->numeric()
-                                                ->default(0.00)
-                                                ->disabled()
-                                                ->dehydrated(),
-                                            TextInput::make('total_ht2')
-                                                ->label('HT2')
-                                                ->numeric()
-                                                ->default(0.00)
-                                                ->disabled()
-                                                ->dehydrated(),
-                                            TextInput::make('total_hve')
-                                                ->label('HVE')
-                                                ->numeric()
-                                                ->default(0.00)
-                                                ->disabled()
-                                                ->dehydrated(),
-                                            TextInput::make('total_km')
-                                                ->label('Kms')
-                                                ->numeric()
-                                                ->default(0)
-                                                ->disabled()
-                                                ->dehydrated(),
-                                            TextInput::make('total_media_dieta')
-                                                ->label('M/D')
-                                                ->numeric()
-                                                ->default(0)
-                                                ->disabled()
-                                                ->dehydrated(),
-                                            TextInput::make('total_dieta')
-                                                ->label('D/C')
-                                                ->numeric()
-                                                ->default(0)
-                                                ->disabled()
-                                                ->dehydrated(),
-                                            TextInput::make('total_hotel')
-                                                ->label('Hotel')
-                                                ->numeric()
-                                                ->default(0)
-                                                ->disabled()
-                                                ->dehydrated(),
-                                        ]),
+                                        ViewField::make('resumen_categorias')
+                                            ->view('filament.resources.parte.resumen-categorias')
+                                            ->columnSpanFull(),
                                     ]),
                             ]),
 
@@ -289,7 +234,7 @@ class ParteTrabajoResource extends Resource
                                                 ->penColorOnDark('#000')
                                                 ->clearable(true)
                                                 ->undoable(false)
-                                                ->confirmable()
+                                                ->confirmable(true, false)
                                                 ->doneAction(fn($action) => $action->iconButton()->icon('heroicon-o-check')->color('success'))
                                                 ->formatStateUsing(function ($state, $record) {
                                                     if (!$state || !$record) {
@@ -340,7 +285,7 @@ class ParteTrabajoResource extends Resource
                                                 ->penColorOnDark('#000')
                                                 ->clearable(true)
                                                 ->undoable(false)
-                                                ->confirmable()
+                                                ->confirmable(true, false)
                                                 ->doneAction(fn($action) => $action->iconButton()->icon('heroicon-o-check')->color('success'))
                                                 ->formatStateUsing(function ($state, $record) {
                                                     if (!$state || !$record) {
@@ -413,6 +358,9 @@ class ParteTrabajoResource extends Resource
                     ->label('Responsable')
                     ->sortable()
                     ->searchable(),
+                TextColumn::make('tarea.titulo')
+                    ->label('Tarea origen')
+                    ->toggleable(),
                 TextColumn::make('estado'),
                 TextColumn::make('estado')
                     ->label('Estado')

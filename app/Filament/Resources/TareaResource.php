@@ -4,14 +4,19 @@ namespace App\Filament\Resources;
 
 use Filament\Schemas\Schema;
 use Filament\Schemas\Components\Section;
+use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Notifications\Notification;
+use App\Filament\Resources\ParteTrabajoResource;
 use App\Filament\Resources\TareaResource\Pages\ListTareas;
 use App\Filament\Resources\TareaResource\Pages\CreateTarea;
 use App\Filament\Resources\TareaResource\Pages\EditTarea;
 use App\Filament\Resources\TareaResource\Pages;
 use App\Filament\Resources\TareaResource\RelationManagers;
+use App\Models\ParteTrabajo;
+use App\Models\SecuenciaParte;
 use App\Models\Tarea;
 use Filament\Forms;
 use Filament\Resources\Resource;
@@ -60,8 +65,8 @@ class TareaResource extends Resource
                             ->required(),
 
                         DatePicker::make('fecha_fin')
-                            ->label('Fecha de fin')
-                            ->required(),
+                            ->label('Fecha de fin'),
+                            //->required(),
 
                         Select::make('estado')
                             ->label('Estado')
@@ -154,6 +159,10 @@ class TareaResource extends Resource
                     ->separator(', ') // o usa ->list() si quieres en vertical
                     ->limit(5) // muestra máximo 3, luego "y 2 más..."
                     ->tooltip(fn($record) => $record->usuarios->pluck('name')->join(', ')),
+                TextColumn::make('parteTrabajo.numero')
+                    ->label('Parte asociado')
+                    ->placeholder('Sin parte')
+                    ->toggleable(),
                 TextColumn::make('fecha_inicio')->label('Inicio')->date('d/m/Y'),
 
             ])
@@ -166,6 +175,65 @@ class TareaResource extends Resource
                     ])
             ])
             ->recordActions([
+                Action::make('crear_parte')
+                    ->label('Crear parte')
+                    ->icon('heroicon-o-document-plus')
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->action(function (Tarea $record): void {
+                        if ($record->parteTrabajo) {
+                            Notification::make()
+                                ->title('La tarea ya tiene un parte asociado')
+                                ->body("Parte: {$record->parteTrabajo->numero}")
+                                ->warning()
+                                ->send();
+
+                            //redirect(ParteTrabajoResource::getUrl('edit', ['record' => $record->parteTrabajo]));
+
+                            return;
+                        }
+
+                        $planta = $record->planta;
+
+                        if (!$planta?->cliente_id) {
+                            Notification::make()
+                                ->title('No se pudo crear el parte')
+                                ->body('La tarea no tiene una planta con cliente asociado.')
+                                ->danger()
+                                ->send();
+
+                            return;
+                        }
+
+                        $codigo = 'TEC';
+                        $anio = (int) now()->format('Y');
+                        $siguienteSecuencia = SecuenciaParte::obtenerSiguiente($codigo, $anio);
+
+                        $parteTrabajo = ParteTrabajo::create([
+                            'numero' => SecuenciaParte::generarNumero($codigo, $anio, $siguienteSecuencia),
+                            'codigo' => $codigo,
+                            'anio' => $anio,
+                            'tarea_id' => $record->id,
+                            'fecha_parte' => $record->fecha_inicio ?? now()->toDateString(),
+                            'cliente_id' => $planta->cliente_id,
+                            'planta_id' => $record->planta_id,
+                            'tipo_trabajo_id' => null,
+                            'comentarios' => $record->descripcion,
+                            'trabajo_realizado' => $record->titulo,
+                            'user_responsable_id' => auth()->id(),
+                            'estado' => 'borrador',
+                        ]);
+
+                        SecuenciaParte::incrementar($codigo, $anio);
+
+                        Notification::make()
+                            ->title('Parte de trabajo creado')
+                            ->body("Se ha creado el parte {$parteTrabajo->numero} sin líneas.")
+                            ->success()
+                            ->send();
+
+                        redirect(ParteTrabajoResource::getUrl('edit', ['record' => $parteTrabajo]));
+                    }),
                 EditAction::make(),
             ])
             ->toolbarActions([

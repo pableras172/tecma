@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Tarea extends Model
 {
@@ -27,5 +28,10 @@ class Tarea extends Model
     public function usuarios()
     {
         return $this->belongsToMany(User::class, 'tarea_usuario');
+    }
+
+    public function parteTrabajo(): HasOne
+    {
+        return $this->hasOne(ParteTrabajo::class);
     }
 }

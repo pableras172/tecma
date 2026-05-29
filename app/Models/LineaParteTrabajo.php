@@ -21,12 +21,15 @@ class LineaParteTrabajo extends Model
         'hora_fin_trabajo_2',
         'hora_vuelta',
         'hora_vuelta_llegada',
-        'he',
-        'hs',
+        'hora_entrada',
+        'hora_salida',
+        'hora_entrada_pers',
+        'hora_salida_pers',
         'ht1',
         'ht2',
         'hve',
         'kms',
+        'esfestivo',
         'media_dieta',
         'dieta_completa',
         'hotel',
@@ -43,10 +46,15 @@ class LineaParteTrabajo extends Model
         'hora_fin_trabajo_2' => 'datetime:H:i',
         'hora_vuelta' => 'datetime:H:i',
         'hora_vuelta_llegada' => 'datetime:H:i',
+        'hora_entrada' => 'datetime:H:i',
+        'hora_salida' => 'datetime:H:i',
+        'hora_entrada_pers' => 'datetime:H:i',
+        'hora_salida_pers' => 'datetime:H:i',
 
         'media_dieta' => 'boolean',
         'dieta_completa' => 'boolean',
         'hotel' => 'boolean',
+        'esfestivo' => 'boolean',
     ];
 
 
